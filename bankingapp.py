@@ -4,6 +4,7 @@ from tkinter import messagebox
 from CTkMenuBar import *
 import random
 import string
+from tkinter import PhotoImage
 
 customtkinter.set_ctk_parent_class(tk.Tk)
 customtkinter.set_appearance_mode("dark")
@@ -19,11 +20,9 @@ class BankingApplication:
     def __init__(self, root):
         self.root = root
         self.root.title("Techatronics Bank")
-        self.root.geometry("350x200")
+        self.root.geometry("500x650")
         menu = CTkMenuBar(root)
-        menu.add_cascade("Login", command=self.open_login_window)
-        menu.add_cascade("Register", command=self.open_registration_window)
-
+       
         self.logged_in_user = None
         self.balance = 0.0
 
@@ -33,11 +32,19 @@ class BankingApplication:
         self.label_main = customtkinter.CTkLabel(self.root, text="Welcome to Techatronics Bank!", font=("Helvetica", 20))
         self.label_main.pack(pady=20)
 
-        self.button_register = customtkinter.CTkButton(self.root, text="Register", command=self.open_registration_window)
-        self.button_register.pack(pady=10)
+        # Bank icon
+        image = PhotoImage(file="banking.png")
+        resizedImage = image.subsample(2, 2)
+        # Display the image
+        self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
+        self.image_label.pack(pady=20)
 
         self.button_login = customtkinter.CTkButton(self.root, text="Login", command=self.open_login_window)
-        self.button_login.pack()
+        self.button_login.pack(pady=10)
+
+        self.button_register = customtkinter.CTkButton(self.root, text="Register", command=self.open_registration_window)
+        self.button_register.pack()
+
 
         self.error_label = customtkinter.CTkLabel(self.root, text="", text_color="red")
         self.error_label.pack()
@@ -47,10 +54,10 @@ class BankingApplication:
         self.root.withdraw()
         registration_window = customtkinter.CTkToplevel(self.root)
         registration_window.title("Register")
-        registration_window.geometry("400x400")
+        registration_window.geometry("500x650")
         menu = CTkMenuBar(registration_window)
+        menu.add_cascade("Home", command=self.create_main_window())
         menu.add_cascade("Login", command=self.open_login_window)
-        menu.add_cascade("Register", command=self.open_registration_window)
 
         self.label_title = customtkinter.CTkLabel(registration_window, text="Register", font=("Helvetica", 35))
         self.label_title.pack(pady=10)
@@ -62,54 +69,57 @@ class BankingApplication:
         self.label_username.pack()
 
         self.entry_username = customtkinter.CTkEntry(registration_frame)
-        self.entry_username.pack(pady=(0, 5))
+        self.entry_username.pack()
 
         self.label_password = customtkinter.CTkLabel(registration_frame, text="Password:")
         self.label_password.pack()
 
         self.entry_password = customtkinter.CTkEntry(registration_frame, show="*")
-        self.entry_password.pack(pady=(0, 5))
+        self.entry_password.pack()
 
         self.var_generate_password = tk.BooleanVar()
         self.checkbutton_generate_password = customtkinter.CTkCheckBox(registration_frame, text="Generate a random password", variable=self.var_generate_password)
         self.checkbutton_generate_password.pack(pady=(10), padx=10)
 
         self.error_label_reg = customtkinter.CTkLabel(registration_frame, text="", text_color="red")
-        self.error_label_reg.pack()
+        self.error_label_reg.pack(padx=10)
 
         self.button_register = customtkinter.CTkButton(registration_frame, text="Register", command=self.register_user)
-        self.button_register.pack(pady=10)
+        self.button_register.pack(pady=30, padx=100)
 
 
     def open_login_window(self):
         self.root.withdraw()
         login_window = customtkinter.CTkToplevel(self.root)
         login_window.title("Login")
-        login_window.geometry("300x300")
+        login_window.geometry("500x650")
         menu = CTkMenuBar(login_window)
-        menu.add_cascade("Login", command=self.open_login_window)
+        menu.add_cascade("Home", command=self.create_main_window)
         menu.add_cascade("Register", command=self.open_registration_window)
 
         self.label_title = customtkinter.CTkLabel(login_window, text="Login", font=("Helvetica", 35))
         self.label_title.pack(pady=10)
 
-        self.label_username = customtkinter.CTkLabel(login_window, text="Username:")
+        login_frame = customtkinter.CTkFrame(login_window)
+        login_frame.pack(padx=10, pady=10)
+
+        self.label_username = customtkinter.CTkLabel(login_frame, text="Username:")
         self.label_username.pack()
 
-        self.entry_username = customtkinter.CTkEntry(login_window)
+        self.entry_username = customtkinter.CTkEntry(login_frame)
         self.entry_username.pack()
 
-        self.label_password = customtkinter.CTkLabel(login_window, text="Password:")
+        self.label_password = customtkinter.CTkLabel(login_frame, text="Password:")
         self.label_password.pack()
 
-        self.entry_password = customtkinter.CTkEntry(login_window, show="*")
+        self.entry_password = customtkinter.CTkEntry(login_frame, show="*")
         self.entry_password.pack()
 
-        self.error_label = customtkinter.CTkLabel(login_window, text="", text_color="red")
-        self.error_label.pack()
+        self.error_label = customtkinter.CTkLabel(login_frame, text="", text_color="red")
+        self.error_label.pack(padx=10)
 
-        self.button_login = customtkinter.CTkButton(login_window, text="Login", command=self.login_user)
-        self.button_login.pack()
+        self.button_login = customtkinter.CTkButton(login_frame, text="Login", command=self.login_user)
+        self.button_login.pack(pady=30, padx=100)
 
     def register_ok(self):
         self.root.withdraw()
