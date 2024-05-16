@@ -20,23 +20,26 @@ class BankingApplication:
     def __init__(self, root):
         self.root = root
         self.root.title("Techatronics Bank")
-        self.root.geometry("500x650")
-        menu = CTkMenuBar(root)
+        self.root.geometry("500x550")
        
         self.logged_in_user = None
         self.balance = 0.0
+        self.current_window = None  
 
         self.create_main_window()
 
     def create_main_window(self):
+        self.destroy_current_window()  
+        self.root.deiconify()
+
         self.label_main = customtkinter.CTkLabel(self.root, text="Welcome to Techatronics Bank!", font=("Helvetica", 20))
         self.label_main.pack(pady=20)
 
-        # Bank icon
         image = PhotoImage(file="banking.png")
         resizedImage = image.subsample(2, 2)
-        # Display the image
+
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
+        self.image_label.image = resizedImage  
         self.image_label.pack(pady=20)
 
         self.button_login = customtkinter.CTkButton(self.root, text="Login", command=self.open_login_window)
@@ -45,19 +48,33 @@ class BankingApplication:
         self.button_register = customtkinter.CTkButton(self.root, text="Register", command=self.open_registration_window)
         self.button_register.pack()
 
+        self.button_quit = customtkinter.CTkButton(self.root, text="Quit", command=self.quit_application)
+        self.button_quit.pack(pady=10)
 
         self.error_label = customtkinter.CTkLabel(self.root, text="", text_color="red")
         self.error_label.pack()
 
+    def destroy_current_window(self):
+        if self.current_window:
+            self.current_window.destroy()
+            self.current_window = None
+
+    def quit_application(self):
+        if messagebox.askokcancel("Quit", "Do you really wish to quit?"):
+            self.root.destroy()
 
     def open_registration_window(self):
+        self.destroy_current_window()
         self.root.withdraw()
         registration_window = customtkinter.CTkToplevel(self.root)
         registration_window.title("Register")
         registration_window.geometry("500x650")
         menu = CTkMenuBar(registration_window)
-        menu.add_cascade("Home", command=self.create_main_window())
+        menu.add_cascade("Home", command=self.create_main_window)
         menu.add_cascade("Login", command=self.open_login_window)
+        menu.add_cascade("Quit", command=self.quit_application)
+
+        self.current_window = registration_window
 
         self.label_title = customtkinter.CTkLabel(registration_window, text="Register", font=("Helvetica", 35))
         self.label_title.pack(pady=10)
@@ -85,10 +102,12 @@ class BankingApplication:
         self.error_label_reg.pack(padx=10)
 
         self.button_register = customtkinter.CTkButton(registration_frame, text="Register", command=self.register_user)
-        self.button_register.pack(pady=30, padx=100)
+        self.button_register.pack(pady=(5, 30), padx=100)
 
+        registration_window.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(registration_window))
 
     def open_login_window(self):
+        self.destroy_current_window()
         self.root.withdraw()
         login_window = customtkinter.CTkToplevel(self.root)
         login_window.title("Login")
@@ -96,6 +115,9 @@ class BankingApplication:
         menu = CTkMenuBar(login_window)
         menu.add_cascade("Home", command=self.create_main_window)
         menu.add_cascade("Register", command=self.open_registration_window)
+        menu.add_cascade("Quit", command=self.quit_application)
+
+        self.current_window = login_window
 
         self.label_title = customtkinter.CTkLabel(login_window, text="Login", font=("Helvetica", 35))
         self.label_title.pack(pady=10)
@@ -119,10 +141,21 @@ class BankingApplication:
         self.error_label.pack(padx=10)
 
         self.button_login = customtkinter.CTkButton(login_frame, text="Login", command=self.login_user)
-        self.button_login.pack(pady=30, padx=100)
+        self.button_login.pack(pady=(5, 30), padx=100)
+
+        login_window.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(login_window))
+
+    def on_window_close(self, window):
+        window.destroy()
+        self.current_window = None
+        self.root.deiconify()
+
+    def return_to_main_window(self):
+        self.destroy_current_window()
+        self.create_main_window()
 
     def register_ok(self):
-        self.root.withdraw()
+        self.return_to_main_window()
         self.open_login_window()
 
     def register_user(self):
@@ -146,8 +179,8 @@ class BankingApplication:
             generated_password = self.generate_password()
             self.entry_password.delete(0, tk.END)
             self.entry_password.insert(0, generated_password)
-            self.entry_password.configure(state='disabled')  # Disable the password entry
-            self.error_label.configure(text=f"Generated Password: {generated_password}. Successfully registered.")
+            self.entry_password.configure(state='disabled')  
+            self.error_label_reg.configure(text=f"Generated Password: {generated_password}. Successfully registered")
         else:
             generated_password = self.entry_password.get()
             if not self.is_strong_password(generated_password):
@@ -161,21 +194,26 @@ class BankingApplication:
             file.write(f"{user.username},{user.password}\n")
         
         self.show_registration_success_window(generated_password)
-        self.root.after(3000, self.close_registration_success_window)
-
 
     def show_registration_success_window(self, generated_password):
+        self.destroy_current_window()
         registration_success_window = customtkinter.CTkToplevel(self.root)
         registration_success_window.title("Registration Successful")
         registration_success_window.geometry("350x150")
+        self.current_window = registration_success_window
         label_success = customtkinter.CTkLabel(registration_success_window, text="Registration Successful!", font=("Helvetica", 20), text_color="green")
         label_success.pack()
 
         label_password = customtkinter.CTkLabel(registration_success_window, text=f"Generated Password: {generated_password}", font=("Helvetica", 15))
         label_password.pack()
 
-    def close_registration_success_window(self):
-        self.open_login_window()  # Open login window after success window closes
+        label_password = customtkinter.CTkLabel(registration_success_window, text="Please remember your password!", font=("Helvetica", 15), text_color="red")
+        label_password.pack()
+
+        self.button_ok = customtkinter.CTkButton(registration_success_window, text="Ok", command=self.register_ok)
+        self.button_ok.pack(pady=5, padx=100)
+
+        registration_success_window.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(registration_success_window))
 
     def login_user(self):
         username = self.entry_username.get()
@@ -185,21 +223,14 @@ class BankingApplication:
             for line in file:
                 data = line.strip().split(",")
                 if len(data) != 2:
-                    continue  # Skip lines that don't contain username and password
+                    continue  
                 stored_username, stored_password = data
                 if username == stored_username:
                     user_found = True
-                    if self.logged_in_user and self.logged_in_user.password != password:
-                        messagebox.showerror("Login Error", "Incorrect password. Please enter the generated password.")
-                        return
-                    elif self.logged_in_user and self.logged_in_user.password == password:
-                        self.error_label.configure(text="Login successful.")
-                        self.open_bank_operations_window()  # Open bank operations window
-                        return
-                    elif password == stored_password:
+                    if password == stored_password:
                         self.logged_in_user = User(username, password)
                         self.error_label.configure(text="Login successful.", text_color="green")
-                        self.open_bank_operations_window()  # Open bank operations window
+                        self.open_bank_operations_window() 
                         return
                     else:
                         self.error_label.configure(text="Invalid password.")
@@ -208,12 +239,18 @@ class BankingApplication:
             self.error_label.configure(text="Username not found. Please register first.")
 
     def open_bank_operations_window(self):
-        self.root.withdraw() 
+        self.destroy_current_window()
         operations_window = customtkinter.CTkToplevel(self.root)
         operations_window.title("Bank Operations")
         operations_window.geometry("300x200")
 
-        self.label_balance = customtkinter.CTkLabel(operations_window, text="Balance: $0.00", font=("Helvetica", 25))
+        try:
+            with open(f"{self.logged_in_user.username}_BankData.txt", "r") as file:
+                self.balance = float(file.read())
+        except FileNotFoundError:
+            self.balance = 0.0
+
+        self.label_balance = customtkinter.CTkLabel(operations_window, text=f"Balance: ${self.balance:.2f}", font=("Helvetica", 25))
         self.label_balance.pack(pady=5)
 
         self.button_deposit = customtkinter.CTkButton(operations_window, text="Deposit", command=self.deposit)
@@ -227,6 +264,8 @@ class BankingApplication:
 
         self.button_print_statement = customtkinter.CTkButton(operations_window, text="Print Statement", command=self.print_bank_statement)
         self.button_print_statement.pack(pady=5)
+
+        operations_window.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(operations_window))
 
     def deposit(self):
         deposit_window = customtkinter.CTkToplevel(self.root)
@@ -258,7 +297,7 @@ class BankingApplication:
 
     def process_deposit(self, entry_amount, window):
         amount = entry_amount.get()
-        if amount.isdigit() and int(amount) > 0:
+        if amount.replace('.', '', 1).isdigit() and float(amount) > 0:
             amount = float(amount)
             self.balance += amount
             self.update_balance(amount)
@@ -266,14 +305,14 @@ class BankingApplication:
             self.update_balance_label()
             window.destroy()
         else:
-            self.error_label.configure(text="Invalid deposit amount. Please enter a positive number.", text_color="red")
+            self.error_label_op.configure(text="Invalid deposit amount. Please enter a positive number.", text_color="red")
 
     def process_withdrawal(self, entry_amount, window):
         amount = entry_amount.get()
-        if amount.isdigit() and int(amount) > 0:
+        if amount.replace('.', '', 1).isdigit() and float(amount) > 0:
             amount = float(amount)
             if amount > self.balance:
-                self.error_label.configure(text="Insufficient funds.")
+                self.error_label_op.configure(text="Insufficient funds.", text_color="red")
             else:
                 self.balance -= amount
                 self.update_balance(-amount)
@@ -281,7 +320,7 @@ class BankingApplication:
                 self.update_balance_label()
                 window.destroy()
         else:
-            self.error_label.configure(text="Invalid withdrawal amount. Please enter a positive number.", text_color="red")
+            self.error_label_op.configure(text="Invalid withdrawal amount. Please enter a positive number.", text_color="red")
 
     def print_bank_statement(self):
         statement = f"Username: {self.logged_in_user.username}\n\n"
