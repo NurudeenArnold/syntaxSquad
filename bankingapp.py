@@ -32,7 +32,7 @@ class BankingApplication:
         self.destroy_current_window()  
         self.root.deiconify()
 
-        self.label_main = customtkinter.CTkLabel(self.root, text="Welcome to Techatronics Bank!", font=("Helvetica", 20))
+        self.label_main = customtkinter.CTkLabel(self.root, text="Welcome to Techatronics Bank!", font=("Helvetica", 25), text_color="#1E90FF")
         self.label_main.pack(pady=20)
 
         image = PhotoImage(file="banking.png")
@@ -76,7 +76,7 @@ class BankingApplication:
 
         self.current_window = registration_window
 
-        self.label_title = customtkinter.CTkLabel(registration_window, text="Register", font=("Helvetica", 35))
+        self.label_title = customtkinter.CTkLabel(registration_window, text="Register", font=("Helvetica", 25), text_color="#1E90FF")
         self.label_title.pack(pady=10)
 
         registration_frame = customtkinter.CTkFrame(registration_window)
@@ -119,7 +119,7 @@ class BankingApplication:
 
         self.current_window = login_window
 
-        self.label_title = customtkinter.CTkLabel(login_window, text="Login", font=("Helvetica", 35))
+        self.label_title = customtkinter.CTkLabel(login_window, text="Login", font=("Helvetica", 25), text_color="#1E90FF")
         self.label_title.pack(pady=10)
 
         login_frame = customtkinter.CTkFrame(login_window)
@@ -165,11 +165,15 @@ class BankingApplication:
             self.error_label_reg.configure(text="Username cannot be empty.")
             return
 
+        if len(username) < 5:
+            self.error_label_reg.configure(text="Username must be at least 5 characters long.")
+            return
+
         with open("UserData.txt", "r") as file:
             for line in file:
                 data = line.strip().split(",")
                 if len(data) != 2:
-                    continue 
+                    continue
                 stored_username, _ = data
                 if username == stored_username:
                     self.error_label_reg.configure(text="Username already registered. Please try a different username.")
@@ -194,6 +198,7 @@ class BankingApplication:
             file.write(f"{user.username},{user.password}\n")
         
         self.show_registration_success_window(generated_password)
+
 
     def show_registration_success_window(self, generated_password):
         self.destroy_current_window()
@@ -242,7 +247,10 @@ class BankingApplication:
         self.destroy_current_window()
         operations_window = customtkinter.CTkToplevel(self.root)
         operations_window.title("Bank Operations")
-        operations_window.geometry("300x200")
+        operations_window.geometry("350x400")
+
+        menu = CTkMenuBar(operations_window)
+        menu.add_cascade("Quit", command=self.quit_application)
 
         try:
             with open(f"{self.logged_in_user.username}_BankData.txt", "r") as file:
@@ -250,14 +258,17 @@ class BankingApplication:
         except FileNotFoundError:
             self.balance = 0.0
 
-        self.label_balance = customtkinter.CTkLabel(operations_window, text=f"Balance: ${self.balance:.2f}", font=("Helvetica", 25))
-        self.label_balance.pack(pady=5)
+        bank_frame = customtkinter.CTkFrame(operations_window)
+        bank_frame.pack(padx=10, pady=10)
+
+        self.label_balance = customtkinter.CTkLabel(bank_frame, text=f"Balance: R{self.balance:.2f}", font=("Helvetica", 25))
+        self.label_balance.pack(pady=50, padx=50)
 
         self.button_deposit = customtkinter.CTkButton(operations_window, text="Deposit", command=self.deposit)
-        self.button_deposit.pack(pady=5)
+        self.button_deposit.pack(pady=10)
 
         self.button_withdraw = customtkinter.CTkButton(operations_window, text="Withdraw", command=self.withdraw)
-        self.button_withdraw.pack(pady=5)
+        self.button_withdraw.pack(pady=10)
 
         self.error_label_op = customtkinter.CTkLabel(operations_window, text="", text_color="red")
         self.error_label_op.pack(pady=5)
@@ -301,7 +312,7 @@ class BankingApplication:
             amount = float(amount)
             self.balance += amount
             self.update_balance(amount)
-            self.error_label_op.configure(text=f"Deposit of ${amount:.2f} successful.", text_color="green")
+            self.error_label_op.configure(text=f"Deposit of R{amount:.2f} successful.", text_color="green")
             self.update_balance_label()
             window.destroy()
         else:
@@ -316,7 +327,7 @@ class BankingApplication:
             else:
                 self.balance -= amount
                 self.update_balance(-amount)
-                self.error_label_op.configure(text=f"Withdrawal of ${amount:.2f} successful.", text_color="green")
+                self.error_label_op.configure(text=f"Withdrawal of R{amount:.2f} successful.", text_color="green")
                 self.update_balance_label()
                 window.destroy()
         else:
@@ -339,7 +350,7 @@ class BankingApplication:
             file.write(f"Balance Adjustment: {amount}\n")
 
     def update_balance_label(self):
-        self.label_balance.configure(text=f"Balance: ${self.balance:.2f}")
+        self.label_balance.configure(text=f"Balance: R{self.balance:.2f}")
 
     def generate_password(self):
         characters = string.ascii_letters + string.digits + string.punctuation

@@ -1,3 +1,13 @@
 Balance Adjustment: 12.0
 Balance Adjustment: -12.0
 Balance Adjustment: 122.0
+Balance Adjustment: 1.0
+Balance Adjustment: -1.1
+Balance Adjustment: 1.1111
+Balance Adjustment: 2.0
+Balance Adjustment: 4.9
+Balance Adjustment: 0.9
+Balance Adjustment: 0.19
+Balance Adjustment: -1.0
+Balance Adjustment: -12.0
+Balance Adjustment: 12.0
