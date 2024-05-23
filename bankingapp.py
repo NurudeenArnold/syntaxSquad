@@ -13,9 +13,10 @@ customtkinter.set_default_color_theme("blue")
 
 
 class User:
-    def __init__(self, username, password):
+    def __init__(self, username, password, pin):
         self.username = username
         self.password = password
+        self.pin = pin
 
 class BankingApplication:
     def __init__(self, root):
@@ -95,6 +96,12 @@ class BankingApplication:
         self.entry_password = customtkinter.CTkEntry(registration_frame, show="*")
         self.entry_password.pack()
 
+        self.label_pin = customtkinter.CTkLabel(registration_frame, text="PIN:")
+        self.label_pin.pack()
+
+        self.entry_pin = customtkinter.CTkEntry(registration_frame, show="*")
+        self.entry_pin.pack()
+
         self.var_generate_password = tk.BooleanVar()
         self.checkbutton_generate_password = customtkinter.CTkCheckBox(registration_frame, text="Generate a random password", variable=self.var_generate_password)
         self.checkbutton_generate_password.pack(pady=(10), padx=10)
@@ -146,6 +153,28 @@ class BankingApplication:
 
         login_window.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(login_window))
 
+    def prompt_pin_window(self):
+        self.destroy_current_window()
+        pin_window = customtkinter.CTkToplevel(self.root)
+        pin_window.title("Enter PIN")
+        pin_window.geometry("300x150")
+        self.current_window = pin_window
+
+        label_pin = customtkinter.CTkLabel(pin_window, text="Enter your PIN:")
+        label_pin.pack(pady=5)
+
+        entry_pin = customtkinter.CTkEntry(pin_window, show="*")
+        entry_pin.pack(pady=5)
+
+        self.error_label_pin = customtkinter.CTkLabel(pin_window, text="", text_color="red")
+        self.error_label_pin.pack(padx=10)
+
+        button_confirm = customtkinter.CTkButton(pin_window, text="Confirm", command=lambda: self.check_pin(entry_pin, pin_window))
+        button_confirm.pack(pady=5)
+
+        pin_window.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(pin_window))
+
+
     def on_window_close(self, window):
         window.destroy()
         self.current_window = None
@@ -160,6 +189,20 @@ class BankingApplication:
         self.open_login_window()
 
     def register_user(self):
+        pin = self.entry_pin.get()
+
+        if not pin.strip():
+            self.error_label_reg.configure(text="PIN cannot be empty.")
+            return
+
+        if not pin.isdigit():
+            self.error_label_reg.configure(text="PIN must contain only numbers.")
+            return
+
+        if len(pin) != 4:
+            self.error_label_reg.configure(text="PIN must be 4 digits long.")
+            return
+        
         username = self.entry_username.get()
 
         if not username.strip():
@@ -194,9 +237,9 @@ class BankingApplication:
             else:
                 self.error_label_reg.configure(text="Password created. Successfully registered.")
 
-        user = User(username, generated_password)
+        user = User(username, generated_password, pin)
         with open("UserData.txt", "a") as file:
-            file.write(f"{user.username},{user.password}\n")
+            file.write(f"{user.username},{user.password},{user.pin}\n")
         
         self.show_registration_success_window(generated_password)
 
@@ -228,21 +271,22 @@ class BankingApplication:
         with open("UserData.txt", "r") as file:
             for line in file:
                 data = line.strip().split(",")
-                if len(data) != 2:
+                if len(data) != 3: 
                     continue  
-                stored_username, stored_password = data
+                stored_username, stored_password, stored_pin = data  
                 if username == stored_username:
                     user_found = True
                     if password == stored_password:
-                        self.logged_in_user = User(username, password)
+                        self.logged_in_user = User(username, password, stored_pin)
                         self.error_label.configure(text="Login successful.", text_color="green")
-                        self.open_bank_operations_window() 
+                        self.prompt_pin_window()
                         return
                     else:
                         self.error_label.configure(text="Invalid password.")
                         return
         if not user_found:
             self.error_label.configure(text="Username not found. Please register first.")
+
 
     def open_bank_operations_window(self):
         self.destroy_current_window()
@@ -307,6 +351,16 @@ class BankingApplication:
         button_confirm = customtkinter.CTkButton(withdraw_window, text="Confirm", command=lambda: self.process_withdrawal(entry_amount, withdraw_window))
         button_confirm.pack(pady=5)
 
+    
+    def check_pin(self, entry_pin, window):
+        entered_pin = entry_pin.get()
+        if entered_pin == self.logged_in_user.pin:
+            self.error_label_pin.configure(text="PIN verified. Login successful.", text_color="green")
+            window.destroy()
+            self.open_bank_operations_window()
+        else:
+            self.error_label_pin.configure(text="Incorrect PIN.", text_color="red")
+            
     def process_deposit(self, entry_amount, window):
         amount = entry_amount.get()
         if amount.replace('.', '', 1).isdigit() and float(amount) > 0:
