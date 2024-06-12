@@ -1,3 +1,0 @@
-Balance Adjustment: 5000.0
-Balance Adjustment: -5000.0
-Balance Adjustment: 200.0
