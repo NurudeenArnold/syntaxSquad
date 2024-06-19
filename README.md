@@ -11,6 +11,7 @@ Suarav Sewparsad<br>
 
 1) Login <br>
     Username & Password <br>
+        Deposit, Withdraw & Print Statement
 2) Register <br>
     Username, Password (Generated or Not), Pin
 3) Quit
