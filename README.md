@@ -6,3 +6,8 @@ Ammaarah Fakier <br>
 Danielle Engelbrecht<br>
 Nurudeen Arnold<br>
 Suarav Sewparsad<br>
+
+## User Functions
+
+1) Login <br>
+2) Register <br>
