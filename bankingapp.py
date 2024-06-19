@@ -11,7 +11,7 @@ customtkinter.set_ctk_parent_class(tk.Tk)
 customtkinter.set_appearance_mode("dark")
 customtkinter.set_default_color_theme("blue") 
 
-
+# This asks the user to input their username, password and pin
 class User:
     def __init__(self, username, password, pin):
         self.username = username
@@ -29,6 +29,14 @@ class BankingApplication:
         self.current_window = None  
 
         self.create_main_window()
+
+    def center_window(self, window, width, height):
+        screen_width = window.winfo_screenwidth()
+        screen_height = window.winfo_screenheight()
+
+        x = (screen_width / 2) - (width / 2)
+        y = (screen_height / 2) - (height / 2)
+        window.geometry(f"{width}x{height}+{int(x)}+{int(y)}")
 
     def create_main_window(self):
         self.destroy_current_window()  
@@ -55,6 +63,8 @@ class BankingApplication:
 
         self.error_label = customtkinter.CTkLabel(self.root, text="", text_color="red")
         self.error_label.pack()
+
+        self.center_window(self.root, 500, 550)
 
     def destroy_current_window(self):
         if self.current_window:
@@ -114,6 +124,8 @@ class BankingApplication:
 
         registration_window.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(registration_window))
 
+        self.center_window(registration_window, 500, 650)
+
     def open_login_window(self):
         self.destroy_current_window()
         self.root.withdraw()
@@ -153,6 +165,8 @@ class BankingApplication:
 
         login_window.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(login_window))
 
+        self.center_window(login_window, 500, 650)
+
     def prompt_pin_window(self):
         self.destroy_current_window()
         pin_window = customtkinter.CTkToplevel(self.root)
@@ -174,6 +188,7 @@ class BankingApplication:
 
         pin_window.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(pin_window))
 
+        self.center_window(pin_window, 300, 150)
 
     def on_window_close(self, window):
         window.destroy()
@@ -264,6 +279,8 @@ class BankingApplication:
 
         registration_success_window.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(registration_success_window))
 
+        self.center_window(registration_success_window, 350, 150)
+
     def login_user(self):
         username = self.entry_username.get()
         password = self.entry_password.get()
@@ -323,6 +340,8 @@ class BankingApplication:
 
         operations_window.protocol("WM_DELETE_WINDOW", lambda: self.on_window_close(operations_window))
 
+        self.center_window(operations_window, 350, 400)
+
     def deposit(self):
         deposit_window = customtkinter.CTkToplevel(self.root)
         deposit_window.title("Deposit")
@@ -336,6 +355,8 @@ class BankingApplication:
 
         button_confirm = customtkinter.CTkButton(deposit_window, text="Confirm", command=lambda: self.process_deposit(entry_amount, deposit_window))
         button_confirm.pack(pady=5)
+
+        self.center_window(deposit_window, 300, 150)
 
     def withdraw(self):
         withdraw_window = customtkinter.CTkToplevel(self.root)
@@ -351,6 +372,7 @@ class BankingApplication:
         button_confirm = customtkinter.CTkButton(withdraw_window, text="Confirm", command=lambda: self.process_withdrawal(entry_amount, withdraw_window))
         button_confirm.pack(pady=5)
 
+        self.center_window(withdraw_window, 300, 150)
     
     def check_pin(self, entry_pin, window):
         entered_pin = entry_pin.get()
@@ -411,8 +433,6 @@ class BankingApplication:
             statement += "No transactions found."
 
         messagebox.showinfo("Bank Statement", statement)
-
-
 
     def update_balance_label(self):
         self.label_balance.configure(text=f"Balance: R{self.balance:.2f}")
