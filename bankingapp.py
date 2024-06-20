@@ -6,6 +6,7 @@ import string
 from datetime import datetime
 
 
+
 customtkinter.set_appearance_mode("Light")
 customtkinter.set_default_color_theme("themes/red.json")
 
@@ -22,7 +23,7 @@ class BankingApplication:
     def __init__(self, root):
         self.root = root
         self.root.title("NexBank")
-        self.root.geometry("400x400")
+        self.root.geometry("500x500")
         self.root.configure(bg="blue")
         self.logged_in_user = None
         self.users = {}
@@ -57,7 +58,6 @@ class BankingApplication:
     def create_main_window(self):
         self.clear_current_frame()
         self.root.configure(bg="red")
-
         self.label_main = customtkinter.CTkLabel(self.root, text="Welcome to NexBank!", font=("Helvetica", 25), text_color= "red")
         self.label_main.pack(pady=20)
 
@@ -80,7 +80,8 @@ class BankingApplication:
         self.error_label = customtkinter.CTkLabel(self.root, text="", text_color="red")
         self.error_label.pack()
 
-        self.center_window(self.root, 500, 550)
+
+
 
     def clear_current_frame(self):
         for widget in self.root.winfo_children():
@@ -265,6 +266,11 @@ class BankingApplication:
 
     def open_dashboard(self):
         self.clear_current_frame()
+        image = PhotoImage(file="Nex3.png")
+        resizedImage = image.subsample(2, 2)
+        self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
+        self.image_label.image = resizedImage
+        self.image_label.pack(pady=20)
 
         self.label_title = customtkinter.CTkLabel(self.root, text=f"Welcome, {self.logged_in_user.username}", font=("Helvetica", 25), text_color="red")
         self.label_title.pack(pady=10)
@@ -292,6 +298,12 @@ class BankingApplication:
     def view_balance(self):
         self.clear_current_frame()
 
+        image = PhotoImage(file="Nex3.png")
+        resizedImage = image.subsample(2, 2)
+        self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
+        self.image_label.image = resizedImage
+        self.image_label.pack(pady=20)
+
         label_balance = customtkinter.CTkLabel(self.root, text=f"Your Balance: ${self.logged_in_user.balance:.2f}", font=("Helvetica", 20))
         label_balance.pack(pady=20)
 
@@ -301,6 +313,11 @@ class BankingApplication:
     def transfer_money(self):
         self.clear_current_frame()
 
+        image = PhotoImage(file="Nex3.png")
+        resizedImage = image.subsample(2, 2)
+        self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
+        self.image_label.image = resizedImage
+        self.image_label.pack(pady=20)
         self.label_title = customtkinter.CTkLabel(self.root, text="Transfer Money", font=("Helvetica", 25), text_color="red")
         self.label_title.pack(pady=10)
 
@@ -367,6 +384,11 @@ class BankingApplication:
     def view_statement(self):
         self.clear_current_frame()
 
+        image = PhotoImage(file="Nex3.png")
+        resizedImage = image.subsample(2, 2)
+        self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
+        self.image_label.image = resizedImage
+        self.image_label.pack(pady=20)
         label_title = customtkinter.CTkLabel(self.root, text="Bank Statement", font=("Helvetica", 25), text_color="red")
         label_title.pack(pady=10)
 
@@ -383,6 +405,14 @@ class BankingApplication:
     def take_loan(self):
         self.clear_current_frame()
 
+        image = PhotoImage(file="Nex3.png")
+        resizedImage = image.subsample(2, 2)
+        self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
+        self.image_label.image = resizedImage
+        self.image_label.pack(pady=20)
+
+        label_title = customtkinter.CTkLabel(self.root, text="Bank Statement", font=("Helvetica", 25), text_color="red")
+        label_title.pack(pady=10)
         self.label_title = customtkinter.CTkLabel(self.root, text="Take Loan/Overdraft", font=("Helvetica", 25), text_color="red")
         self.label_title.pack(pady=10)
 
@@ -425,6 +455,14 @@ class BankingApplication:
     def view_personal_details(self):
         self.clear_current_frame()
 
+        image = PhotoImage(file="Nex3.png")
+        resizedImage = image.subsample(2, 2)
+        self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
+        self.image_label.image = resizedImage
+        self.image_label.pack(pady=20)
+
+        label_title = customtkinter.CTkLabel(self.root, text="Bank Statement", font=("Helvetica", 25), text_color="red")
+        label_title.pack(pady=10)
         label_title = customtkinter.CTkLabel(self.root, text="Personal Details", font=("Helvetica", 25), text_color="red")
         label_title.pack(pady=10)
 
