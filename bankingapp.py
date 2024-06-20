@@ -435,6 +435,7 @@ class BankingApplication:
 
         messagebox.showinfo("Bank Statement", statement)
 
+
     def update_balance_label(self):
         self.label_balance.configure(text=f"Balance: R{self.balance:.2f}")
 
