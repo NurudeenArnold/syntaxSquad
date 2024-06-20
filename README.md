@@ -10,7 +10,7 @@ Suarav Sewparsad<br>
 ## User Functions
 
 1) Login <br>
-    Username & Password <br>
+       Email & Password <br>
        View Balance <br>
        Transfer Money to other users<br>
        View Bank Statement<br>
@@ -19,5 +19,6 @@ Suarav Sewparsad<br>
        View Personal Details<br>
        Logout<br>
 3) Register <br>
-    Username, Password (Generated or Not), Pin
-4) Quit
+   Email, Password (Generated or Not), Pin
+   Email Notification of Credentials
+5) Quit
