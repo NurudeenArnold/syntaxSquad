@@ -11,12 +11,12 @@ Suarav Sewparsad<br>
 
 1) Login <br>
     Username & Password <br>
-       View Balance 
-       Transfer Money to other users
-       View Bank Statement
-       Download Bank Statement
-       Take Loan/Overdraft
-       View Personal Details
+       View Balance <br>
+       Transfer Money to other users<br>
+       View Bank Statement<br>
+       Download Bank Statement<br>
+       Take Loan/Overdraft<br>
+       View Personal Details<br>
 3) Register <br>
     Username, Password (Generated or Not), Pin
 4) Quit
