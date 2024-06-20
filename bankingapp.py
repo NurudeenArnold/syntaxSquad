@@ -4,15 +4,28 @@ from tkinter import messagebox, PhotoImage
 import random
 import string
 from datetime import datetime
-
-
+import pyrebase
+import re
 
 customtkinter.set_appearance_mode("Light")
 customtkinter.set_default_color_theme("themes/red.json")
 
+config = {
+  'apiKey': "AIzaSyBGLrAGmwh6MrAr-AFmsL3UABWAgbso0HM",
+  'authDomain': "syntaxsquad-nexbank.firebaseapp.com",
+  'databaseURL': "https://syntaxsquad-nexbank.firebaseio.com", 
+  'projectId': "syntaxsquad-nexbank",
+  'storageBucket': "syntaxsquad-nexbank.appspot.com",
+  'messagingSenderId': "298348806189",
+  'appId': "1:298348806189:web:dd797595648b94a93d38a4"
+}
+
+firebase = pyrebase.initialize_app(config)
+auth = firebase.auth()
+
 class User:
-    def __init__(self, username, password, pin, account_number):
-        self.username = username
+    def __init__(self, email, password, pin, account_number):
+        self.email = email
         self.password = password
         self.pin = pin
         self.account_number = account_number
@@ -38,15 +51,15 @@ class BankingApplication:
                 for line in file:
                     data = line.strip().split(",")
                     if len(data) == 4:
-                        username, password, pin, account_number = data
-                        self.users[username] = User(username, password, pin, account_number)
+                        email, password, pin, account_number = data
+                        self.users[email] = User(email, password, pin, account_number)
         except FileNotFoundError:
             pass
 
     def save_users(self):
         with open("UserData.txt", "w") as file:
             for user in self.users.values():
-                file.write(f"{user.username},{user.password},{user.pin},{user.account_number}\n")
+                file.write(f"{user.email},{user.password},{user.pin},{user.account_number}\n")
 
     def center_window(self, width, height):
         screen_width = self.root.winfo_screenwidth()
@@ -100,11 +113,11 @@ class BankingApplication:
         registration_frame = customtkinter.CTkFrame(self.root)
         registration_frame.pack(padx=10, pady=10)
 
-        self.label_username = customtkinter.CTkLabel(registration_frame, text="Username:")
-        self.label_username.pack()
+        self.label_email = customtkinter.CTkLabel(registration_frame, text="email:")
+        self.label_email.pack()
 
-        self.entry_username = customtkinter.CTkEntry(registration_frame)
-        self.entry_username.pack()
+        self.entry_email = customtkinter.CTkEntry(registration_frame)
+        self.entry_email.pack()
 
         self.label_password = customtkinter.CTkLabel(registration_frame, text="Password:")
         self.label_password.pack()
@@ -153,11 +166,11 @@ class BankingApplication:
         login_frame = customtkinter.CTkFrame(self.root)
         login_frame.pack(padx=10, pady=10)
 
-        self.label_username = customtkinter.CTkLabel(login_frame, text="Username:")
-        self.label_username.pack()
+        self.label_email = customtkinter.CTkLabel(login_frame, text="email:")
+        self.label_email.pack()
 
-        self.entry_username = customtkinter.CTkEntry(login_frame)
-        self.entry_username.pack()
+        self.entry_email = customtkinter.CTkEntry(login_frame)
+        self.entry_email.pack()
 
         self.label_password = customtkinter.CTkLabel(login_frame, text="Password:")
         self.label_password.pack()
@@ -212,19 +225,24 @@ class BankingApplication:
         if len(pin) != 4:
             self.error_label_reg.configure(text="PIN must be 4 digits long.")
             return
-        
-        username = self.entry_username.get()
 
-        if not username.strip():
-            self.error_label_reg.configure(text="Username cannot be empty.")
+        email = self.entry_email.get()
+
+        if not email.strip():
+            self.error_label_reg.configure(text="Email cannot be empty.")
             return
 
-        if len(username) < 5:
-            self.error_label_reg.configure(text="Username must be at least 5 characters long.")
+        email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        if not re.match(email_regex, email):
+            self.error_label_reg.configure(text="Invalid email format.")
             return
 
-        if username in self.users:
-            self.error_label_reg.configure(text="Username already registered. Please try a different username.")
+        if len(email) < 5:
+            self.error_label_reg.configure(text="Email must be at least 5 characters long.")
+            return
+
+        if email in self.users:
+            self.error_label_reg.configure(text="Email already registered. Please try a different email.")
             return
 
         if self.var_generate_password.get():
@@ -235,12 +253,19 @@ class BankingApplication:
                 self.error_label_reg.configure(text="Password is not strong. \nPlease include lowercase, uppercase, digits, and symbols.")
                 return
 
-        account_number = self.generate_account_number()
-        user = User(username, password, pin, account_number)
-        self.users[username] = user
-        self.save_users()
-        
-        self.show_registration_success_window(password)
+        try:
+            # Create a user with Firebase Auth
+            auth.create_user_with_email_and_password(email, password)
+            
+            account_number = self.generate_account_number()
+            user = User(email, password, pin, account_number)
+            self.users[email] = user
+            self.save_users()
+            
+            self.show_registration_success_window(password)
+        except Exception as e:
+            self.error_label_reg.configure(text="Error: " + str(e))
+
 
     def show_registration_success_window(self, generated_password):
         self.clear_current_frame()
@@ -255,14 +280,24 @@ class BankingApplication:
         button_ok.pack(pady=20)
 
     def login_user(self):
-        username = self.entry_username.get()
-        password = self.entry_password.get()
+        email = self.entry_email.get().strip()  
+        password = self.entry_password.get().strip()  
 
-        if username in self.users and self.users[username].password == password:
-            self.logged_in_user = self.users[username]
+        if not email:
+            self.error_label.configure(text="Email cannot be empty.")
+            return
+
+        if not password:
+            self.error_label.configure(text="Password cannot be empty.")
+            return
+
+        try:
+            user = auth.sign_in_with_email_and_password(email, password)
+            db = firebase.database()
             self.open_dashboard()
-        else:
-            self.error_label.configure(text="Invalid username or password.")
+        except Exception as e:
+            self.error_label.configure(text="Invalid Email or Password")
+
 
     def open_dashboard(self):
         self.clear_current_frame()
@@ -272,7 +307,7 @@ class BankingApplication:
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
 
-        self.label_title = customtkinter.CTkLabel(self.root, text=f"Welcome, {self.logged_in_user.username}", font=("Helvetica", 25), text_color="red")
+        self.label_title = customtkinter.CTkLabel(self.root, text=f"Welcome", font=("Helvetica", 25), text_color="red")
         self.label_title.pack(pady=10)
 
         self.button_balance = customtkinter.CTkButton(self.root, text="View Balance", command=self.view_balance)
@@ -375,8 +410,8 @@ class BankingApplication:
         recipient.balance += amount
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.logged_in_user.transactions.append(f"Transferred ${amount:.2f} to {recipient.username} on {timestamp}")
-        recipient.transactions.append(f"Received ${amount:.2f} from {self.logged_in_user.username} on {timestamp}")
+        self.logged_in_user.transactions.append(f"Transferred ${amount:.2f} to {recipient.email} on {timestamp}")
+        recipient.transactions.append(f"Received ${amount:.2f} from {self.logged_in_user.email} on {timestamp}")
 
         self.save_users()
         self.error_label_transfer.configure(text="Transfer successful.", text_color="green")
@@ -469,8 +504,8 @@ class BankingApplication:
         details_frame = customtkinter.CTkFrame(self.root)
         details_frame.pack(padx=10, pady=10)
 
-        label_username = customtkinter.CTkLabel(details_frame, text=f"Username: {self.logged_in_user.username}")
-        label_username.pack()
+        label_email = customtkinter.CTkLabel(details_frame, text=f"email: {self.logged_in_user.email}")
+        label_email.pack()
 
         label_account_number = customtkinter.CTkLabel(details_frame, text=f"Account Number: {self.logged_in_user.account_number}")
         label_account_number.pack()
