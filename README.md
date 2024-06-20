@@ -17,6 +17,7 @@ Suarav Sewparsad<br>
        Download Bank Statement<br>
        Take Loan/Overdraft<br>
        View Personal Details<br>
+       Logout<br>
 3) Register <br>
     Username, Password (Generated or Not), Pin
 4) Quit
