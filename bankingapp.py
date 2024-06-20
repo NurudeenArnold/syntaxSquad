@@ -207,7 +207,7 @@ class BankingApplication:
         if email in self.users and self.users[email].password == password:
             self.logged_in_user = self.users[email]
             self.error_label.configure(text="")
-            self.open_account_window()
+            self.open_dashboard()
         else:
             self.error_label.configure(text="Invalid email or password.")
 
@@ -236,6 +236,35 @@ class BankingApplication:
         except Exception as e:
             messagebox.showerror("Error", f"Failed to send email: {str(e)}")
 
+    def open_dashboard(self):
+        self.clear_current_frame()
+
+        self.label_title = customtkinter.CTkLabel(self.root, text="Dashboard", font=("Helvetica", 25), text_color="red")
+        self.label_title.pack(pady=10)
+
+        dashboard_frame = customtkinter.CTkFrame(self.root)
+        dashboard_frame.pack(padx=10, pady=10)
+
+        self.label_welcome = customtkinter.CTkLabel(dashboard_frame, text=f"Welcome, {self.logged_in_user.email}!")
+        self.label_welcome.pack()
+
+        self.button_account_details = customtkinter.CTkButton(dashboard_frame, text="Account Details", command=self.open_account_window)
+        self.button_account_details.pack(pady=5)
+
+        self.button_deposit = customtkinter.CTkButton(dashboard_frame, text="Deposit", command=self.open_deposit_window)
+        self.button_deposit.pack(pady=5)
+
+        self.button_withdraw = customtkinter.CTkButton(dashboard_frame, text="Withdraw", command=self.open_withdraw_window)
+        self.button_withdraw.pack(pady=5)
+
+        self.button_transaction_history = customtkinter.CTkButton(dashboard_frame, text="Transaction History", command=self.open_transaction_history_window)
+        self.button_transaction_history.pack(pady=5)
+
+        self.button_logout = customtkinter.CTkButton(dashboard_frame, text="Logout", command=self.logout_user)
+        self.button_logout.pack(pady=10)
+
+        self.center_window(450, 450)
+
     def open_account_window(self):
         self.clear_current_frame()
 
@@ -251,8 +280,93 @@ class BankingApplication:
         self.label_balance = customtkinter.CTkLabel(account_frame, text=f"Balance: ${self.logged_in_user.balance:.2f}")
         self.label_balance.pack()
 
-        self.button_logout = customtkinter.CTkButton(account_frame, text="Logout", command=self.logout_user)
-        self.button_logout.pack(pady=10)
+        self.button_back = customtkinter.CTkButton(account_frame, text="Back", command=self.open_dashboard)
+        self.button_back.pack(pady=10)
+
+    def open_deposit_window(self):
+        self.clear_current_frame()
+
+        self.label_title = customtkinter.CTkLabel(self.root, text="Deposit", font=("Helvetica", 25), text_color="red")
+        self.label_title.pack(pady=10)
+
+        deposit_frame = customtkinter.CTkFrame(self.root)
+        deposit_frame.pack(padx=10, pady=10)
+
+        self.label_amount = customtkinter.CTkLabel(deposit_frame, text="Amount to Deposit:")
+        self.label_amount.pack()
+
+        self.entry_amount = customtkinter.CTkEntry(deposit_frame)
+        self.entry_amount.pack()
+
+        self.button_deposit = customtkinter.CTkButton(deposit_frame, text="Deposit", command=self.deposit)
+        self.button_deposit.pack(pady=10)
+
+        self.button_back = customtkinter.CTkButton(deposit_frame, text="Back", command=self.open_dashboard)
+        self.button_back.pack(pady=10)
+
+    def deposit(self):
+        try:
+            amount = float(self.entry_amount.get())
+            if amount <= 0:
+                raise ValueError("Invalid amount")
+            self.logged_in_user.balance += amount
+            self.logged_in_user.transactions.append((datetime.now(), f"Deposited ${amount:.2f}"))
+            self.save_users()
+            messagebox.showinfo("Success", f"Deposited ${amount:.2f} successfully.")
+            self.open_account_window()
+        except ValueError:
+            messagebox.showerror("Error", "Please enter a valid amount.")
+
+    def open_withdraw_window(self):
+        self.clear_current_frame()
+
+        self.label_title = customtkinter.CTkLabel(self.root, text="Withdraw", font=("Helvetica", 25), text_color="red")
+        self.label_title.pack(pady=10)
+
+        withdraw_frame = customtkinter.CTkFrame(self.root)
+        withdraw_frame.pack(padx=10, pady=10)
+
+        self.label_amount = customtkinter.CTkLabel(withdraw_frame, text="Amount to Withdraw:")
+        self.label_amount.pack()
+
+        self.entry_amount = customtkinter.CTkEntry(withdraw_frame)
+        self.entry_amount.pack()
+
+        self.button_withdraw = customtkinter.CTkButton(withdraw_frame, text="Withdraw", command=self.withdraw)
+        self.button_withdraw.pack(pady=10)
+
+        self.button_back = customtkinter.CTkButton(withdraw_frame, text="Back", command=self.open_dashboard)
+        self.button_back.pack(pady=10)
+
+    def withdraw(self):
+        try:
+            amount = float(self.entry_amount.get())
+            if amount <= 0 or amount > self.logged_in_user.balance:
+                raise ValueError("Invalid amount")
+            self.logged_in_user.balance -= amount
+            self.logged_in_user.transactions.append((datetime.now(), f"Withdrew ${amount:.2f}"))
+            self.save_users()
+            messagebox.showinfo("Success", f"Withdrew ${amount:.2f} successfully.")
+            self.open_account_window()
+        except ValueError:
+            messagebox.showerror("Error", "Please enter a valid amount.")
+
+    def open_transaction_history_window(self):
+        self.clear_current_frame()
+
+        self.label_title = customtkinter.CTkLabel(self.root, text="Transaction History", font=("Helvetica", 25), text_color="red")
+        self.label_title.pack(pady=10)
+
+        transaction_frame = customtkinter.CTkFrame(self.root)
+        transaction_frame.pack(padx=10, pady=10)
+
+        for transaction in self.logged_in_user.transactions:
+            date, desc = transaction
+            label_transaction = customtkinter.CTkLabel(transaction_frame, text=f"{date}: {desc}")
+            label_transaction.pack()
+
+        self.button_back = customtkinter.CTkButton(transaction_frame, text="Back", command=self.open_dashboard)
+        self.button_back.pack(pady=10)
 
     def logout_user(self):
         self.logged_in_user = None
