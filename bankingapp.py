@@ -7,6 +7,8 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 customtkinter.set_appearance_mode("Light")
 customtkinter.set_default_color_theme("themes/red.json")
@@ -218,7 +220,7 @@ class BankingApplication:
         sender_email = "sewparsad60@gmail.com"
         sender_password = "xahk ahrn vvyl lgua"  # Replace this with your app password
         subject = "NexBank Registration Successful"
-        body = f"Dear User,\n\nThank you for registering with NexBank.\n\nYour login details are as follows:\nEmail: {email}\nPassword: {password}\n\nPlease keep this information secure.\n\nBest regards,\nNexBank Team"
+        body = f"Dear User,\n\nThank you for registering with NexBank.\n\nYour login details are as follows:\nEmail: {email}\nPassword: {password}\n\nPlease keep this information secure.\n\nBest Regards,\nNexBank Team"
 
         msg = MIMEMultipart()
         msg['From'] = "Nex Bank"
@@ -230,8 +232,7 @@ class BankingApplication:
             server = smtplib.SMTP('smtp.gmail.com', 587)
             server.starttls()
             server.login(sender_email, sender_password)
-            text = msg.as_string()
-            server.sendmail(sender_email, email, text)
+            server.sendmail(sender_email, email, msg.as_string())
             server.quit()
         except Exception as e:
             messagebox.showerror("Error", f"Failed to send email: {str(e)}")
@@ -367,6 +368,29 @@ class BankingApplication:
 
         self.button_back = customtkinter.CTkButton(transaction_frame, text="Back", command=self.open_dashboard)
         self.button_back.pack(pady=10)
+
+        self.button_download = customtkinter.CTkButton(transaction_frame, text="Download as PDF", command=self.download_transaction_history)
+        self.button_download.pack(pady=10)
+
+    def download_transaction_history(self):
+        file_name = f"Transaction_History_{self.logged_in_user.account_number}.pdf"
+        c = canvas.Canvas(file_name, pagesize=letter)
+        c.drawString(100, 750, f"Transaction History for Account: {self.logged_in_user.account_number}")
+        c.drawString(100, 730, f"Email: {self.logged_in_user.email}")
+        c.drawString(100, 710, "Date and Time                      Description")
+
+        y_position = 690
+        for transaction in self.logged_in_user.transactions:
+            date, desc = transaction
+            c.drawString(100, y_position, f"{date.strftime('%Y-%m-%d %H:%M:%S')}   {desc}")
+            y_position -= 20
+
+            if y_position < 50:
+                c.showPage()
+                y_position = 750
+
+        c.save()
+        messagebox.showinfo("Success", f"Transaction history downloaded as {file_name}")
 
     def logout_user(self):
         self.logged_in_user = None
