@@ -22,7 +22,7 @@ class BankingApplication:
     def __init__(self, root):
         self.root = root
         self.root.title("NexBank")
-        self.root.geometry("450x550")
+        self.root.geometry("400x400")
         self.root.configure(bg="blue")
         self.logged_in_user = None
         self.balance = 0.0
@@ -44,7 +44,7 @@ class BankingApplication:
         self.root.configure(bg="red")
         self.label_main = customtkinter.CTkLabel(self.root, text="Welcome to NexBank!", font=("Helvetica", 25), text_color= "red")
         self.label_main.pack(pady=20)
-
+        self.root.geometry("400x400")
 
         image = PhotoImage(file="Nex3.png")
         resizedImage = image.subsample(1, 1)
@@ -65,7 +65,7 @@ class BankingApplication:
         self.error_label = customtkinter.CTkLabel(self.root, text="", text_color="red")
         self.error_label.pack()
 
-        self.center_window(self.root, 500, 550)
+        self.center_window(self.root, 400, 500)
 
     def destroy_current_window(self):
         if self.current_window:
