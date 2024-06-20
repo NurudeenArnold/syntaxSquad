@@ -1,12 +1,16 @@
 import tkinter as tk
 import customtkinter
-from tkinter import messagebox, PhotoImage
+from tkinter import Canvas, Frame, messagebox, PhotoImage
 import random
 import string
+from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from datetime import datetime
+import re
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
 
 customtkinter.set_appearance_mode("Light")
 customtkinter.set_default_color_theme("themes/red.json")
@@ -38,16 +42,102 @@ class BankingApplication:
             with open("UserData.txt", "r") as file:
                 for line in file:
                     data = line.strip().split(",")
-                    if len(data) == 4:
+                    if len(data) == 5:  
+                        email, password, pin, account_number, balance = data
+                        self.users[email] = User(email, password, pin, account_number)
+                        self.users[email].balance = float(balance) 
+                    elif len(data) == 4:
                         email, password, pin, account_number = data
                         self.users[email] = User(email, password, pin, account_number)
+                    self.load_transaction_history(email)
         except FileNotFoundError:
             pass
 
     def save_users(self):
         with open("UserData.txt", "w") as file:
             for user in self.users.values():
-                file.write(f"{user.email},{user.password},{user.pin},{user.account_number}\n")
+                file.write(f"{user.email},{user.password},{user.pin},{user.account_number},{user.balance}\n")
+
+    def load_transaction_history(self, email):
+        try:
+            with open("Transactionlog.txt", "r") as file:
+                self.users[email].transactions.clear()
+                for line in file:
+                    transaction_data = line.strip().split(",")
+                    if len(transaction_data) >= 2 and transaction_data[0] == email:
+                        transaction_details = ",".join(transaction_data[1:])
+                        if email in self.users:
+                            self.users[email].transactions.append(transaction_details)
+        except FileNotFoundError:
+            pass
+
+
+
+    def save_transaction_log(self, email, transaction_details):
+        with open("Transactionlog.txt", "a") as file:
+            file.write(f"{email},{transaction_details}\n")
+
+    def process_transfer(self):
+        account_number = self.entry_account_number.get()
+        amount_str = self.entry_amount.get()
+        amount = float(amount_str)
+        recipient = None
+
+        if account_number == self.logged_in_user.account_number:
+            self.error_label_transfer.configure(text="You cannot transfer to yourself. Nice try")
+            return
+        
+        if not amount_str.strip() or not amount_str.isdigit() or float(amount_str) <= 0:
+            self.error_label_transfer.configure(text="Please enter a valid amount.")
+            return
+
+        if amount > self.logged_in_user.balance:
+            self.error_label_transfer.configure(text="Insufficient funds.")
+            return
+
+        for user in self.users.values():
+            if user.account_number == account_number:
+                recipient = user
+                break
+
+        if not recipient:
+            self.error_label_transfer.configure(text="Recipient account number not found.")
+            return
+
+        self.logged_in_user.balance -= amount
+        recipient.balance += amount
+
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.logged_in_user.transactions.append(f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}")
+        recipient.transactions.append(f"Received R{amount:.2f} from {self.logged_in_user.account_number} on {timestamp}")
+
+        self.save_users()
+        self.save_transaction_log(self.logged_in_user.email, f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}")
+        self.save_transaction_log(recipient.email, f"Received R{amount:.2f} from {self.logged_in_user.account_number} on {timestamp}")
+
+        self.error_label_transfer.configure(text="Transfer successful.", text_color="green")
+        self.create_popup("Transfer Successful", f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}", page=self.open_dashboard)
+
+    def process_loan(self):
+        amount_str = self.entry_loan_amount.get()
+
+        if not amount_str.strip() or not amount_str.isdigit() or float(amount_str) <= 0:
+            self.error_label_loan.configure(text="Please enter a valid amount.")
+            return
+
+        amount = float(amount_str)
+        self.logged_in_user.balance += amount
+
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        transaction_details = f"Loan of R{amount:.2f} received on {timestamp}"
+        
+        self.logged_in_user.transactions.append(f"{self.logged_in_user.email}, {transaction_details}")
+
+        self.save_users()
+        self.save_transaction_log(self.logged_in_user.email, transaction_details)
+
+        self.error_label_loan.configure(text="Loan approved and credited to your account.", text_color="green")
+        self.create_popup("Loan Accepted", f"Loan of R{amount:.2f} received on {timestamp}", page=self.open_dashboard)
 
     def center_window(self, width, height):
         screen_width = self.root.winfo_screenwidth()
@@ -59,8 +149,9 @@ class BankingApplication:
     def create_main_window(self):
         self.clear_current_frame()
         self.root.configure(bg="red")
-        self.label_main = customtkinter.CTkLabel(self.root, text="Welcome to NexBank!", font=("Helvetica", 25), text_color="red")
+        self.label_main = customtkinter.CTkLabel(self.root, text="Welcome to NexBank!", font=("Helvetica", 25), text_color= "red")
         self.label_main.pack(pady=20)
+
 
         image = PhotoImage(file="Nex3.png")
         resizedImage = image.subsample(1, 1)
@@ -79,6 +170,8 @@ class BankingApplication:
 
         self.error_label = customtkinter.CTkLabel(self.root, text="", text_color="red")
         self.error_label.pack()
+
+        self.center_window(450, 550)
 
     def clear_current_frame(self):
         for widget in self.root.winfo_children():
@@ -162,101 +255,404 @@ class BankingApplication:
         self.entry_password = customtkinter.CTkEntry(login_frame, show="*")
         self.entry_password.pack()
 
+        self.error_label = customtkinter.CTkLabel(login_frame, text="", text_color="red")
+        self.error_label.pack(padx=10)
+
         self.button_login = customtkinter.CTkButton(login_frame, text="Login", command=self.login_user)
-        self.button_login.pack(pady=10)
+        self.button_login.pack(pady=(5, 30), padx=100)
 
         self.button_back = customtkinter.CTkButton(login_frame, text="Back", command=self.create_main_window)
-        self.button_back.pack()
+        self.button_back.pack(pady=(5, 30), padx=100)
 
-        self.error_label = customtkinter.CTkLabel(login_frame, text="", text_color="red")
-        self.error_label.pack()
+        self.center_window(450, 550)
 
-        self.center_window(450, 450)
+    def return_to_main_window(self):
+        self.clear_current_frame()
+        self.create_main_window()
 
-    def generate_password(self):
-        length = 8
-        letters_and_digits = string.ascii_letters + string.digits
-        return ''.join(random.choice(letters_and_digits) for i in range(length))
-
-    def register_user(self):
-        email = self.entry_email.get()
-        password = self.entry_password.get()
-        pin = self.entry_pin.get()
-
-        if not email or not password or not pin:
-            self.error_label_reg.configure(text="All fields are required.")
-            return
-
-        if email in self.users:
-            self.error_label_reg.configure(text="Email already registered.")
-            return
-
-        account_number = self.generate_account_number()
-        self.users[email] = User(email, password, pin, account_number)
-        self.save_users()
-
-        # Send email with registration details
-        self.send_registration_email(email, password)
-
-        self.error_label_reg.configure(text="Registration successful.", text_color="green")
-
-    def login_user(self):
-        email = self.entry_email.get()
-        password = self.entry_password.get()
-
-        if email in self.users and self.users[email].password == password:
-            self.logged_in_user = self.users[email]
-            self.error_label.configure(text="")
-            self.open_account_window()
-        else:
-            self.error_label.configure(text="Invalid email or password.")
-
-    def generate_account_number(self):
-        return ''.join(random.choices(string.digits, k=10))
+    def register_ok(self):
+        self.return_to_main_window()
+        self.open_login_window()
 
     def send_registration_email(self, email, password):
         sender_email = "sewparsad60@gmail.com"
-        sender_password = "xahk ahrn vvyl lgua"  # Replace this with your app password
+        sender_password = "xahk ahrn vvyl lgua" 
         subject = "NexBank Registration Successful"
         body = f"Dear User,\n\nThank you for registering with NexBank.\n\nYour login details are as follows:\nEmail: {email}\nPassword: {password}\n\nPlease keep this information secure.\n\nBest regards,\nNexBank Team"
-
         msg = MIMEMultipart()
         msg['From'] = "Nex Bank"
         msg['To'] = email
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
-
         try:
             server = smtplib.SMTP('smtp.gmail.com', 587)
             server.starttls()
             server.login(sender_email, sender_password)
             text = msg.as_string()
-            server.sendmail(sender_email, email, text)
+            server.sendmail(sender_email, email, msg.as_string())
             server.quit()
         except Exception as e:
             messagebox.showerror("Error", f"Failed to send email: {str(e)}")
 
-    def open_account_window(self):
+    def generate_account_number(self):
+        return ''.join(random.choices(string.digits, k=10))
+
+    def generate_password(self):
+        characters = string.ascii_letters + string.digits + string.punctuation
+        return ''.join(random.choice(characters) for i in range(10))
+
+    def is_strong_password(self, password):
+        has_lower = any(c.islower() for c in password)
+        has_upper = any(c.isupper() for c in password)
+        has_digit = any(c.isdigit() for c in password)
+        has_special = any(c in string.punctuation for c in password)
+        return len(password) >= 8 and has_lower and has_upper and has_digit and has_special
+
+    def register_user(self):
+        pin = self.entry_pin.get()
+        email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+
+        if not pin.strip():
+            self.error_label_reg.configure(text="PIN cannot be empty.")
+            return
+
+        if not pin.isdigit():
+            self.error_label_reg.configure(text="PIN must contain only numbers.")
+            return
+
+        if len(pin) != 4:
+            self.error_label_reg.configure(text="PIN must be 4 digits long.")
+            return
+        
+        email = self.entry_email.get()
+        email = email.lower()
+
+        if not email.strip():
+            self.error_label_reg.configure(text="email cannot be empty.")
+            return
+
+        if email in self.users:
+            self.error_label_reg.configure(text="email already registered. Please try a different email.")
+            return
+
+        if not re.match(email_pattern, email):
+            self.error_label_reg.configure(text="Invalid email format.")
+            return
+
+        if self.var_generate_password.get():
+            password = self.entry_password.get()
+        else:
+            password = self.entry_password.get()
+            if not self.is_strong_password(password):
+                self.error_label_reg.configure(text="Password is not strong. \nPlease include lowercase, uppercase, digits, and symbols.")
+                return
+
+        account_number = self.generate_account_number()
+        user = User(email, password, pin, account_number)
+        self.users[email] = user
+        self.save_users()
+        self.send_registration_email(email, password)
+        
+        self.create_popup("Register Successful", "Please check your email for your credentials. \nYou will be able to login now.", page=self.open_login_window)
+
+    def show_registration_success_window(self, generated_password):
         self.clear_current_frame()
 
-        self.label_title = customtkinter.CTkLabel(self.root, text="Account Details", font=("Helvetica", 25), text_color="red")
+        label_success = customtkinter.CTkLabel(self.root, text="Registration Successful!", font=("Helvetica", 20), text_color="green")
+        label_success.pack(pady=10)
+
+        label_password = customtkinter.CTkLabel(self.root, text=f"You will be able to login now.", font=("Helvetica", 15))
+        label_password.pack(pady=5)
+
+        button_ok = customtkinter.CTkButton(self.root, text="OK", command=self.register_ok)
+        button_ok.pack(pady=20)
+
+        self.center_window(450, 150)
+
+    def login_user(self):
+        email = self.entry_email.get()
+        email = email.lower()
+        password = self.entry_password.get()
+
+        if email in self.users and self.users[email].password == password:
+            self.logged_in_user = self.users[email]
+            self.open_dashboard()
+        else:
+            self.error_label.configure(text="Invalid email or password.")
+
+    def open_dashboard(self):
+        self.clear_current_frame()
+        image = PhotoImage(file="Nex3.png")
+        resizedImage = image.subsample(2, 2)
+        self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
+        self.image_label.image = resizedImage
+        self.image_label.pack(pady=20)
+
+        self.label_title = customtkinter.CTkLabel(self.root, text="Dashboard", font=("Helvetica", 25), text_color="red")
         self.label_title.pack(pady=10)
 
-        account_frame = customtkinter.CTkFrame(self.root)
-        account_frame.pack(padx=10, pady=10)
+        self.button_balance = customtkinter.CTkButton(self.root, text="View Balance", command=self.view_balance)
+        self.button_balance.pack(pady=10)
 
-        self.label_account_number = customtkinter.CTkLabel(account_frame, text=f"Account Number: {self.logged_in_user.account_number}")
-        self.label_account_number.pack()
+        self.button_transfer = customtkinter.CTkButton(self.root, text="Transfer Money", command=self.transfer_money)
+        self.button_transfer.pack(pady=10)
 
-        self.label_balance = customtkinter.CTkLabel(account_frame, text=f"Balance: ${self.logged_in_user.balance:.2f}")
-        self.label_balance.pack()
+        self.button_statement = customtkinter.CTkButton(self.root, text="View Bank Statement", command=self.view_statement)
+        self.button_statement.pack(pady=10)
 
-        self.button_logout = customtkinter.CTkButton(account_frame, text="Logout", command=self.logout_user)
+        self.button_loan = customtkinter.CTkButton(self.root, text="Take Loan/Overdraft", command=self.take_loan)
+        self.button_loan.pack(pady=10)
+
+        self.button_personal_details = customtkinter.CTkButton(self.root, text="View Personal Details", command=self.view_personal_details)
+        self.button_personal_details.pack(pady=10)
+
+        self.button_logout = customtkinter.CTkButton(self.root, text="Logout", command=self.create_main_window)
         self.button_logout.pack(pady=10)
 
-    def logout_user(self):
-        self.logged_in_user = None
-        self.create_main_window()
+        self.center_window(450, 650)
+
+    def view_balance(self):
+        self.clear_current_frame()
+
+        image = PhotoImage(file="Nex3.png")
+        resizedImage = image.subsample(2, 2)
+        self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
+        self.image_label.image = resizedImage
+        self.image_label.pack(pady=20)
+
+        label_balance = customtkinter.CTkLabel(self.root, text=f"Your Balance: R{self.logged_in_user.balance:.2f}", font=("Helvetica", 20))
+        label_balance.pack(pady=20)
+
+        button_back = customtkinter.CTkButton(self.root, text="Back", command=self.open_dashboard)
+        button_back.pack(pady=10)
+
+        self.center_window(450, 550)
+
+    def transfer_money(self):
+        self.clear_current_frame()
+
+        image = PhotoImage(file="Nex3.png")
+        resizedImage = image.subsample(2, 2)
+        self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
+        self.image_label.image = resizedImage
+        self.image_label.pack(pady=20)
+        self.label_title = customtkinter.CTkLabel(self.root, text="Transfer Money", font=("Helvetica", 25), text_color="red")
+        self.label_title.pack(pady=10)
+
+        transfer_frame = customtkinter.CTkFrame(self.root)
+        transfer_frame.pack(padx=10, pady=10)
+
+        label_account_number = customtkinter.CTkLabel(transfer_frame, text="Recipient Account Number:")
+        label_account_number.pack()
+
+        self.entry_account_number = customtkinter.CTkEntry(transfer_frame)
+        self.entry_account_number.pack()
+
+        label_amount = customtkinter.CTkLabel(transfer_frame, text="Amount:")
+        label_amount.pack()
+
+        self.entry_amount = customtkinter.CTkEntry(transfer_frame)
+        self.entry_amount.pack()
+
+        self.error_label_transfer = customtkinter.CTkLabel(transfer_frame, text="", text_color="red")
+        self.error_label_transfer.pack(padx=10)
+
+        button_transfer = customtkinter.CTkButton(transfer_frame, text="Transfer", command=self.process_transfer)
+        button_transfer.pack(pady=(5, 30), padx=100)
+
+        button_back = customtkinter.CTkButton(transfer_frame, text="Back", command=self.open_dashboard)
+        button_back.pack(pady=(5, 30), padx=100)
+
+        self.center_window(450, 550)
+
+    def view_statement(self):
+        self.clear_current_frame()
+        self.load_transaction_history(self.logged_in_user.email)
+
+        image = PhotoImage(file="Nex3.png")
+        resizedImage = image.subsample(2, 2)
+        self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
+        self.image_label.image = resizedImage
+        self.image_label.pack(pady=20)
+
+        label_title = customtkinter.CTkLabel(self.root, text="Bank Statement", font=("Helvetica", 25), text_color="red")
+        label_title.pack(pady=10, padx=100)
+
+        canvas = Canvas(self.root, borderwidth=0, highlightthickness=0)
+        frame = Frame(canvas)
+        vsb = tk.Scrollbar(self.root, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=vsb.set)
+
+        vsb.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
+
+        canvas.create_window((0, 0), window=frame, anchor="n", width=self.root.winfo_width())
+
+        frame.bind("<Configure>", lambda event, canvas=canvas: self.on_frame_configure(canvas))
+
+        if not self.logged_in_user.transactions:
+            no_transactions_label = customtkinter.CTkLabel(frame, text="No transactions made yet.", justify="center")
+            no_transactions_label.pack(pady=10, padx=(30, 0))
+        else:
+            for transaction in self.logged_in_user.transactions:
+                transaction_label = customtkinter.CTkLabel(frame, text=transaction, wraplength=400, justify="center")
+                transaction_label.pack(pady=5, padx=(30, 0))
+
+        self.error_label_pdf = customtkinter.CTkLabel(frame, text="", text_color="red")
+        self.error_label_pdf.pack(padx=(30, 0))
+
+        self.button_download = customtkinter.CTkButton(frame, text="Download as PDF", command=self.download_transaction_history)
+        self.button_download.pack(pady=10, padx=(30, 0))
+
+        button_back = customtkinter.CTkButton(frame, text="Back", command=self.open_dashboard)
+        button_back.pack(pady=10, padx=(30, 0))
+
+        self.center_window(450, 550)
+
+    def on_frame_configure(self, canvas):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+
+
+    def download_transaction_history(self):
+        if not self.logged_in_user.transactions:
+            self.error_label_pdf.configure(text="Cannot download if there are no transactions made yet.")
+            return
+
+        pdf_filename = f"{self.logged_in_user.account_number}_transaction_history.pdf"
+        c = canvas.Canvas(pdf_filename, pagesize=letter)
+
+        logo_path = "Nex2.png"
+        c.drawImage(logo_path, 50, 650, width=100, height=100)  
+
+        c.setFont("Helvetica", 12)
+        c.drawString(400, 665, "Account Number: " + self.logged_in_user.account_number)
+        c.drawString(400, 650, "Email: " + self.logged_in_user.email)
+
+        c.setFont("Helvetica-Bold", 16)
+        c.drawString(50, 600, "Transaction History")
+
+        c.setFont("Helvetica", 12)
+        c.drawString(50, 570, "-" * 70)
+
+        y_position = 555
+        max_y = 50  
+
+        for transaction in self.logged_in_user.transactions:
+            transaction_parts = transaction.split(" on ")
+            if len(transaction_parts) >= 2:
+                transaction_info = transaction_parts[0].strip()
+                timestamp = transaction_parts[1].strip()
+
+                c.drawString(50, y_position, f"Transaction: {transaction_info}")
+                c.drawString(50, y_position - 15, f"Timestamp: {timestamp}")
+                c.drawString(50, y_position - 30, "-" * 70)
+                y_position -= 45
+
+                if y_position < max_y:
+                    c.showPage()
+                    logo_path = "Nex2.png"
+                    c.drawImage(logo_path, 50, 650, width=100, height=100)  
+                    c.setFont("Helvetica-Bold", 16)
+                    c.drawString(50, 600, "Continued Transaction History")
+                    c.setFont("Helvetica", 12)
+                    c.drawString(50, 570, "-" * 70)
+                    y_position = 555 
+
+            else:
+                print(f"Issue with transaction format: {transaction}")
+
+        c.save()
+        print(f"Transaction history saved to {pdf_filename}")
+
+    def take_loan(self):
+        self.clear_current_frame()
+
+        image = PhotoImage(file="Nex3.png")
+        resizedImage = image.subsample(2, 2)
+        self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
+        self.image_label.image = resizedImage
+        self.image_label.pack(pady=20)
+
+        label_title = customtkinter.CTkLabel(self.root, text="Bank Statement", font=("Helvetica", 25), text_color="red")
+        label_title.pack(pady=10)
+        self.label_title = customtkinter.CTkLabel(self.root, text="Take Loan/Overdraft", font=("Helvetica", 25), text_color="red")
+        self.label_title.pack(pady=10)
+
+        loan_frame = customtkinter.CTkFrame(self.root)
+        loan_frame.pack(padx=10, pady=10)
+
+        label_amount = customtkinter.CTkLabel(loan_frame, text="Loan Amount:")
+        label_amount.pack()
+
+        self.entry_loan_amount = customtkinter.CTkEntry(loan_frame)
+        self.entry_loan_amount.pack()
+
+        self.error_label_loan = customtkinter.CTkLabel(loan_frame, text="", text_color="red")
+        self.error_label_loan.pack(padx=10)
+
+        button_loan = customtkinter.CTkButton(loan_frame, text="Apply", command=self.process_loan)
+        button_loan.pack(pady=(5, 30), padx=100)
+
+        button_back = customtkinter.CTkButton(loan_frame, text="Back", command=self.open_dashboard)
+        button_back.pack(pady=(5, 30), padx=100)
+
+        self.center_window(450, 550)
+
+    def view_personal_details(self):
+        self.clear_current_frame()
+
+        image = PhotoImage(file="Nex3.png")
+        resizedImage = image.subsample(2, 2)
+        self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
+        self.image_label.image = resizedImage
+        self.image_label.pack(pady=20)
+
+        label_title = customtkinter.CTkLabel(self.root, text="Personal Details", font=("Helvetica", 25), text_color="red")
+        label_title.pack(pady=10)
+
+        details_frame = customtkinter.CTkFrame(self.root)
+        details_frame.pack(padx=10, pady=10)
+
+        label_email = customtkinter.CTkLabel(details_frame, text=f"Email: {self.logged_in_user.email}")
+        label_email.pack()
+
+        label_account_number = customtkinter.CTkLabel(details_frame, text=f"Account Number: {self.logged_in_user.account_number}")
+        label_account_number.pack()
+
+        label_balance = customtkinter.CTkLabel(details_frame, text=f"Balance: R{self.logged_in_user.balance:.2f}")
+        label_balance.pack()
+
+        button_back = customtkinter.CTkButton(details_frame, text="Back", command=self.open_dashboard)
+        button_back.pack(pady=10, padx=100)
+
+        self.center_window(450, 550)
+
+    def generate_password(self):
+        characters = string.ascii_letters + string.digits + string.punctuation
+        return ''.join(random.choice(characters) for i in range(10))
+
+    def create_popup(self, title, message, text_color="black", page=""):
+        self.clear_current_frame()
+        popup = customtkinter.CTkFrame(self.root)
+        popup.pack(padx=20, pady=20)
+
+        label_title = customtkinter.CTkLabel(popup, text=title, font=("Helvetica", 25), text_color="red")
+        label_title.pack(pady=10)
+
+        label_message = customtkinter.CTkLabel(popup, text=message, font=("Helvetica", 12), text_color=text_color)
+        label_message.pack(pady=10)
+
+        button_ok = customtkinter.CTkButton(popup, text="OK", command=page)
+        button_ok.pack(pady=10, padx=100)
+
+        self.center_window(550, 300)
+
+    def is_strong_password(self, password):
+        has_lower = any(c.islower() for c in password)
+        has_upper = any(c.isupper() for c in password)
+        has_digit = any(c.isdigit() for c in password)
+        has_special = any(c in string.punctuation for c in password)
+        return len(password) >= 8 and has_lower and has_upper and has_digit and has_special
 
 if __name__ == "__main__":
     root = customtkinter.CTk()
