@@ -19,6 +19,6 @@ Suarav Sewparsad<br>
        View Personal Details<br>
        Logout<br>
 3) Register <br>
-   Email, Password (Generated or Not), Pin
-   Email Notification of Credentials
+   Email, Password (Generated or Not), Pin <br>
+   Email Notification of Credentials <br>
 5) Quit
