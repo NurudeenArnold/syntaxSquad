@@ -113,7 +113,7 @@ class BankingApplication:
         registration_frame = customtkinter.CTkFrame(self.root)
         registration_frame.pack(padx=10, pady=10)
 
-        self.label_email = customtkinter.CTkLabel(registration_frame, text="email:")
+        self.label_email = customtkinter.CTkLabel(registration_frame, text="Email:")
         self.label_email.pack()
 
         self.entry_email = customtkinter.CTkEntry(registration_frame)
@@ -166,7 +166,7 @@ class BankingApplication:
         login_frame = customtkinter.CTkFrame(self.root)
         login_frame.pack(padx=10, pady=10)
 
-        self.label_email = customtkinter.CTkLabel(login_frame, text="email:")
+        self.label_email = customtkinter.CTkLabel(login_frame, text="Email:")
         self.label_email.pack()
 
         self.entry_email = customtkinter.CTkEntry(login_frame)
