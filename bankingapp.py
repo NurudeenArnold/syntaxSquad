@@ -8,8 +8,8 @@ from tkinter import PhotoImage
 from datetime import datetime
 
 customtkinter.set_ctk_parent_class(tk.Tk)
-customtkinter.set_appearance_mode("dark")
-customtkinter.set_default_color_theme("blue") 
+customtkinter.set_appearance_mode("Light")  # Modes: "System" (standard), "Dark", "Light"
+customtkinter.set_default_color_theme("themes/red.json")
 
 # This asks the user to input their username, password and pin
 class User:
@@ -21,13 +21,13 @@ class User:
 class BankingApplication:
     def __init__(self, root):
         self.root = root
-        self.root.title("Techatronics Bank")
-        self.root.geometry("500x550")
-       
+        self.root.title("NexBank")
+        self.root.geometry("450x550")
+        self.root.configure(bg="blue")
         self.logged_in_user = None
         self.balance = 0.0
-        self.current_window = None  
-
+        self.current_window = None
+        self.root.resizable(False, False)
         self.create_main_window()
 
     def center_window(self, window, width, height):
@@ -41,12 +41,13 @@ class BankingApplication:
     def create_main_window(self):
         self.destroy_current_window()  
         self.root.deiconify()
-
-        self.label_main = customtkinter.CTkLabel(self.root, text="Welcome to Techatronics Bank!", font=("Helvetica", 25), text_color="#1E90FF")
+        self.root.configure(bg="red")
+        self.label_main = customtkinter.CTkLabel(self.root, text="Welcome to NexBank!", font=("Helvetica", 25), text_color= "red")
         self.label_main.pack(pady=20)
 
-        image = PhotoImage(file="banking.png")
-        resizedImage = image.subsample(2, 2)
+
+        image = PhotoImage(file="Nex3.png")
+        resizedImage = image.subsample(1, 1)
 
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage  
@@ -80,7 +81,7 @@ class BankingApplication:
         self.root.withdraw()
         registration_window = customtkinter.CTkToplevel(self.root)
         registration_window.title("Register")
-        registration_window.geometry("500x650")
+        registration_window.geometry("500x550")
         menu = CTkMenuBar(registration_window)
         menu.add_cascade("Home", command=self.create_main_window)
         menu.add_cascade("Login", command=self.open_login_window)
@@ -88,7 +89,7 @@ class BankingApplication:
 
         self.current_window = registration_window
 
-        self.label_title = customtkinter.CTkLabel(registration_window, text="Register", font=("Helvetica", 25), text_color="#1E90FF")
+        self.label_title = customtkinter.CTkLabel(registration_window, text="Register", font=("Helvetica", 25), text_color="red")
         self.label_title.pack(pady=10)
 
         registration_frame = customtkinter.CTkFrame(registration_window)
@@ -139,7 +140,7 @@ class BankingApplication:
 
         self.current_window = login_window
 
-        self.label_title = customtkinter.CTkLabel(login_window, text="Login", font=("Helvetica", 25), text_color="#1E90FF")
+        self.label_title = customtkinter.CTkLabel(login_window, text="Login", font=("Helvetica", 25), text_color="red")
         self.label_title.pack(pady=10)
 
         login_frame = customtkinter.CTkFrame(login_window)
