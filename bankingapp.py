@@ -1,6 +1,7 @@
 import tkinter as tk
 import customtkinter
 from tkinter import Canvas, Frame, messagebox, PhotoImage
+from PIL import Image, ImageTk
 import random
 import string
 from datetime import datetime
@@ -8,21 +9,25 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import re
+from tkinter import filedialog
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
+import threading
 
 customtkinter.set_appearance_mode("Light")
 customtkinter.set_default_color_theme("themes/red.json")
 
 class User:
-    def __init__(self, email, password, pin, account_number):
+    def __init__(self, email, password, account_number, contact, ID, dob):
         self.email = email
         self.password = password
-        self.pin = pin
         self.account_number = account_number
         self.balance = 0.0
         self.transactions = []
+        self.ID = ID
+        self.contact = contact
+        self.dob = dob
 
 class BankingApplication:
     def __init__(self, root):
@@ -37,18 +42,28 @@ class BankingApplication:
         self.root.resizable(False, False)
         self.create_main_window()
 
+        self.show_path = "eye.png"
+        self.show = Image.open(self.show_path)
+        self.show = self.show.resize((20, 20), Image.LANCZOS)
+        self.imgShow = ImageTk.PhotoImage(self.show)
+
+        self.hide_path = "eyeslash.png"
+        self.hide = Image.open(self.hide_path)
+        self.hide = self.hide.resize((20, 20), Image.LANCZOS)
+        self.imgHide = ImageTk.PhotoImage(self.hide)
+
     def load_users(self):
         try:
             with open("UserData.txt", "r") as file:
                 for line in file:
                     data = line.strip().split(",")
-                    if len(data) == 5:  
-                        email, password, pin, account_number, balance = data
-                        self.users[email] = User(email, password, pin, account_number)
+                    if len(data) == 7:  
+                        email, password, account_number, balance, ID,  contact, dob = data
+                        self.users[email] = User(email, password, account_number, ID,  contact, dob, )
                         self.users[email].balance = float(balance) 
-                    elif len(data) == 4:
-                        email, password, pin, account_number = data
-                        self.users[email] = User(email, password, pin, account_number)
+                    elif len(data) == 6:
+                        email, password, account_number, ID,  contact, dob = data
+                        self.users[email] = User(email, password, account_number, ID,  contact, dob)
                     self.load_transaction_history(email)
         except FileNotFoundError:
             pass
@@ -56,7 +71,7 @@ class BankingApplication:
     def save_users(self):
         with open("UserData.txt", "w") as file:
             for user in self.users.values():
-                file.write(f"{user.email},{user.password},{user.pin},{user.account_number},{user.balance}\n")
+                file.write(f"{user.email},{user.password},{user.account_number},{user.balance}, {user.ID},{user.contact},{user.dob}\n")
 
     def load_transaction_history(self, email):
         try:
@@ -181,6 +196,14 @@ class BankingApplication:
         if messagebox.askokcancel("Quit", "Do you really wish to quit?"):
             self.root.destroy()
 
+    def toggle_password_visibility(self):
+        if self.entry_password.cget('show') == '':
+            self.entry_password.configure(show='*')
+            self.password_visibility_button.configure(image=self.imgShow)
+        else:
+            self.entry_password.configure(show='')
+            self.password_visibility_button.configure(image=self.imgHide)
+
     def open_registration_window(self):
         self.clear_current_frame()
 
@@ -189,6 +212,24 @@ class BankingApplication:
 
         registration_frame = customtkinter.CTkFrame(self.root)
         registration_frame.pack(padx=10, pady=10)
+
+        self.label_ID = customtkinter.CTkLabel(registration_frame, text="ID Number:")
+        self.label_ID.pack()
+
+        self.entry_ID = customtkinter.CTkEntry(registration_frame)
+        self.entry_ID.pack()
+
+        self.label_DOB = customtkinter.CTkLabel(registration_frame, text="Date of Birth (DD/MM/YYYY):")
+        self.label_DOB.pack()
+
+        self.entry_DOB = customtkinter.CTkEntry(registration_frame)
+        self.entry_DOB.pack()
+
+        self.label_contact = customtkinter.CTkLabel(registration_frame, text="Contact Number:")
+        self.label_contact.pack()
+
+        self.entry_contact = customtkinter.CTkEntry(registration_frame)
+        self.entry_contact.pack()
 
         self.label_email = customtkinter.CTkLabel(registration_frame, text="Email:")
         self.label_email.pack()
@@ -199,17 +240,23 @@ class BankingApplication:
         self.label_password = customtkinter.CTkLabel(registration_frame, text="Password:")
         self.label_password.pack()
 
-        self.entry_password = customtkinter.CTkEntry(registration_frame, show="*")
-        self.entry_password.pack()
+        password_frame = customtkinter.CTkFrame(registration_frame, fg_color="transparent")
+        password_frame.pack()
 
-        self.label_pin = customtkinter.CTkLabel(registration_frame, text="PIN:")
-        self.label_pin.pack()
+        self.entry_password = customtkinter.CTkEntry(password_frame, show="*")
+        self.entry_password.pack(side="left", padx=(35, 0))
 
-        self.entry_pin = customtkinter.CTkEntry(registration_frame, show="*")
-        self.entry_pin.pack()
+        self.password_visibility_button = customtkinter.CTkButton(password_frame, image=self.imgShow, command=self.toggle_password_visibility, text="", width=20, height=20, fg_color="transparent", bg_color="transparent", hover=False)
+        self.password_visibility_button.pack(side="left", padx=(0, 0))
+
+        self.label_confirmPassword = customtkinter.CTkLabel(registration_frame, text="Confirm Password:")
+        self.label_confirmPassword.pack()
+
+        self.entry_confirmPassword = customtkinter.CTkEntry(registration_frame, show="*")
+        self.entry_confirmPassword.pack()
 
         self.var_generate_password = tk.BooleanVar()
-        self.checkbutton_generate_password = customtkinter.CTkCheckBox(registration_frame, text="Generate a random password", variable=self.var_generate_password, command=self.toggle_password_entry)
+        self.checkbutton_generate_password = customtkinter.CTkCheckBox(registration_frame, text="Generate password", variable=self.var_generate_password, command=self.toggle_password_entry)
         self.checkbutton_generate_password.pack(pady=(10), padx=10)
 
         self.error_label_reg = customtkinter.CTkLabel(registration_frame, text="", text_color="red")
@@ -226,11 +273,20 @@ class BankingApplication:
     def toggle_password_entry(self):
         if self.var_generate_password.get():
             generated_password = self.generate_password()
+
+            self.entry_confirmPassword.configure(state='normal')
+            self.entry_confirmPassword.delete(0, tk.END)
+            self.entry_confirmPassword.insert(0, generated_password)
+            self.entry_confirmPassword.configure(state='disabled')
+
             self.entry_password.configure(state='normal')
             self.entry_password.delete(0, tk.END)
             self.entry_password.insert(0, generated_password)
             self.entry_password.configure(state='disabled')
         else:
+            self.entry_confirmPassword.configure(state='normal')
+            self.entry_confirmPassword.delete(0, tk.END)
+
             self.entry_password.configure(state='normal')
             self.entry_password.delete(0, tk.END)
 
@@ -252,8 +308,15 @@ class BankingApplication:
         self.label_password = customtkinter.CTkLabel(login_frame, text="Password:")
         self.label_password.pack()
 
-        self.entry_password = customtkinter.CTkEntry(login_frame, show="*")
-        self.entry_password.pack()
+        password_frame = customtkinter.CTkFrame(login_frame, fg_color="transparent")
+        password_frame.pack()
+
+        self.entry_password = customtkinter.CTkEntry(password_frame, show="*")
+        self.entry_password.pack(side="left", padx=(35, 0))
+
+        self.password_visibility_button = customtkinter.CTkButton(password_frame, image=self.imgShow, command=self.toggle_password_visibility, text="", width=20, height=20, fg_color="transparent", bg_color="transparent", hover=False)
+        self.password_visibility_button.pack(side="left", padx=(0, 0))
+
 
         self.error_label = customtkinter.CTkLabel(login_frame, text="", text_color="red")
         self.error_label.pack(padx=10)
@@ -309,30 +372,57 @@ class BankingApplication:
         return len(password) >= 8 and has_lower and has_upper and has_digit and has_special
 
     def register_user(self):
-        pin = self.entry_pin.get()
         email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        dob = self.entry_DOB.get().strip()
+        ID = self.entry_ID.get().strip()
+        contact = self.entry_contact.get().strip()
 
-        if not pin.strip():
-            self.error_label_reg.configure(text="PIN cannot be empty.")
+        if not re.match(r'\d{2}/\d{2}/\d{4}', dob):
+            self.error_label_reg.configure(text="Please enter Date of Birth in DD/MM/YYYY format.")
             return
 
-        if not pin.isdigit():
-            self.error_label_reg.configure(text="PIN must contain only numbers.")
+        try:
+            dob_date = datetime.strptime(dob, '%d/%m/%Y')
+        except ValueError:
+            self.error_label_reg.configure(text="Invalid Date of Birth.")
             return
 
-        if len(pin) != 4:
-            self.error_label_reg.configure(text="PIN must be 4 digits long.")
+        today = datetime.today()
+        age = today.year - dob_date.year - ((today.month, today.day) < (dob_date.month, dob_date.day))
+
+        if age < 18:
+            self.error_label_reg.configure(text="You must be older than 18 years to register.")
+            return
+        
+        if not ID.isdigit():
+            self.error_label_reg.configure(text="Please enter a valid ID Number")
+            return
+        
+        if len(ID) != 13:
+            self.error_label_reg.configure(text="Please enter a 13-digit ID Number")
+            return
+        
+        if not contact.isdigit():
+            self.error_label_reg.configure(text="Please enter a valid South African phone number")
+            return
+
+        if len(contact) != 10:
+            self.error_label_reg.configure(text="Please enter a 10-digit South African phone number.")
             return
         
         email = self.entry_email.get()
         email = email.lower()
 
         if not email.strip():
-            self.error_label_reg.configure(text="email cannot be empty.")
+            self.error_label_reg.configure(text="Email cannot be empty.")
             return
 
         if email in self.users:
-            self.error_label_reg.configure(text="email already registered. Please try a different email.")
+            self.error_label_reg.configure(text="Email already registered. Please try a different email.")
+            return
+        
+        if ID in self.users:
+            self.error_label_reg.configure(text="There is already an account with this ID Number.")
             return
 
         if not re.match(email_pattern, email):
@@ -346,9 +436,13 @@ class BankingApplication:
             if not self.is_strong_password(password):
                 self.error_label_reg.configure(text="Password is not strong. \nPlease include lowercase, uppercase, digits, and symbols.")
                 return
+        
+        if password != self.entry_confirmPassword.get():
+            self.error_label_reg.configure(text="Passwords do not match.")
+            return
 
         account_number = self.generate_account_number()
-        user = User(email, password, pin, account_number)
+        user = User(email, password, account_number, contact, ID, dob)
         self.users[email] = user
         self.save_users()
         self.send_registration_email(email, password)
@@ -501,7 +595,7 @@ class BankingApplication:
         self.error_label_pdf = customtkinter.CTkLabel(frame, text="", text_color="red")
         self.error_label_pdf.pack(padx=(30, 0))
 
-        self.button_download = customtkinter.CTkButton(frame, text="Download as PDF", command=self.download_transaction_history)
+        self.button_download = customtkinter.CTkButton(frame, text="Download as PDF", command=self.start_download_thread)
         self.button_download.pack(pady=10, padx=(30, 0))
 
         button_back = customtkinter.CTkButton(frame, text="Back", command=self.open_dashboard)
@@ -512,21 +606,33 @@ class BankingApplication:
     def on_frame_configure(self, canvas):
         canvas.configure(scrollregion=canvas.bbox("all"))
 
-
     def download_transaction_history(self):
         if not self.logged_in_user.transactions:
             self.error_label_pdf.configure(text="Cannot download if there are no transactions made yet.")
             return
 
-        pdf_filename = f"{self.logged_in_user.account_number}_transaction_history.pdf"
+        # Open a file dialog to choose the save location
+        root = tk.Tk()
+        root.withdraw()  # Hide the root window
+        pdf_filename = filedialog.asksaveasfilename(
+            defaultextension=".pdf",
+            filetypes=[("PDF files", "*.pdf")],
+            initialfile=f"{self.logged_in_user.account_number}_transaction_history.pdf"
+        )
+        if not pdf_filename:
+            return  # User canceled the save dialog
+
         c = canvas.Canvas(pdf_filename, pagesize=letter)
 
         logo_path = "Nex2.png"
-        c.drawImage(logo_path, 50, 650, width=100, height=100)  
+        c.drawImage(logo_path, 50, 650, width=100, height=100)
 
         c.setFont("Helvetica", 12)
-        c.drawString(400, 665, "Account Number: " + self.logged_in_user.account_number)
-        c.drawString(400, 650, "Email: " + self.logged_in_user.email)
+        c.drawString(350, 710, "ID Number: " + self.logged_in_user.ID)
+        c.drawString(350, 695, "Contact Number: " + self.logged_in_user.contact)
+        c.drawString(350, 680, "DOB (DD/MM/YYYY): " + self.logged_in_user.dob)
+        c.drawString(350, 665, "Account Number: " + self.logged_in_user.account_number)
+        c.drawString(350, 650, "Email: " + self.logged_in_user.email)
 
         c.setFont("Helvetica-Bold", 16)
         c.drawString(50, 600, "Transaction History")
@@ -535,7 +641,7 @@ class BankingApplication:
         c.drawString(50, 570, "-" * 70)
 
         y_position = 555
-        max_y = 50  
+        max_y = 50
 
         for transaction in self.logged_in_user.transactions:
             transaction_parts = transaction.split(" on ")
@@ -551,18 +657,19 @@ class BankingApplication:
                 if y_position < max_y:
                     c.showPage()
                     logo_path = "Nex2.png"
-                    c.drawImage(logo_path, 50, 650, width=100, height=100)  
+                    c.drawImage(logo_path, 50, 650, width=100, height=100)
                     c.setFont("Helvetica-Bold", 16)
                     c.drawString(50, 600, "Continued Transaction History")
                     c.setFont("Helvetica", 12)
                     c.drawString(50, 570, "-" * 70)
-                    y_position = 555 
+                    y_position = 555
 
             else:
                 print(f"Issue with transaction format: {transaction}")
 
         c.save()
         print(f"Transaction history saved to {pdf_filename}")
+
 
     def take_loan(self):
         self.clear_current_frame()
@@ -613,11 +720,20 @@ class BankingApplication:
         details_frame = customtkinter.CTkFrame(self.root)
         details_frame.pack(padx=10, pady=10)
 
-        label_email = customtkinter.CTkLabel(details_frame, text=f"Email: {self.logged_in_user.email}")
+        label_email = customtkinter.CTkLabel(details_frame, text=f"ID Number: {self.logged_in_user.ID}")
         label_email.pack()
 
         label_account_number = customtkinter.CTkLabel(details_frame, text=f"Account Number: {self.logged_in_user.account_number}")
         label_account_number.pack()
+
+        label_email = customtkinter.CTkLabel(details_frame, text=f"Contact Number: {self.logged_in_user.contact}")
+        label_email.pack()
+
+        label_email = customtkinter.CTkLabel(details_frame, text=f"Date of Birth: {self.logged_in_user.dob}")
+        label_email.pack()
+
+        label_email = customtkinter.CTkLabel(details_frame, text=f"Email: {self.logged_in_user.email}")
+        label_email.pack()
 
         label_balance = customtkinter.CTkLabel(details_frame, text=f"Balance: R{self.logged_in_user.balance:.2f}")
         label_balance.pack()
@@ -653,6 +769,10 @@ class BankingApplication:
         has_digit = any(c.isdigit() for c in password)
         has_special = any(c in string.punctuation for c in password)
         return len(password) >= 8 and has_lower and has_upper and has_digit and has_special
+    
+    def start_download_thread(self):
+        download_thread = threading.Thread(target=self.download_transaction_history)
+        download_thread.start()
 
 if __name__ == "__main__":
     root = customtkinter.CTk()
