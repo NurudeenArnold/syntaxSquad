@@ -18,7 +18,6 @@ import threading
 customtkinter.set_appearance_mode("Light")
 customtkinter.set_default_color_theme("themes/red.json")
 
-
 class User:
     def __init__(self, email, password, account_number, contact, ID, dob):
         self.email = email
@@ -53,6 +52,26 @@ class BankingApplication:
         self.hide = Image.open(self.hide_path)
         self.hide = self.hide.resize((20, 20), Image.LANCZOS)
         self.imgHide = ImageTk.PhotoImage(self.hide)
+
+        self.user_path = "user.png"
+        self.user = Image.open(self.user_path)
+        self.user = self.user.resize((20, 20), Image.LANCZOS)
+        self.imgUser = ImageTk.PhotoImage(self.user)
+
+        self.phone_path = "phone.png"
+        self.phone = Image.open(self.phone_path)
+        self.phone = self.phone.resize((20, 20), Image.LANCZOS)
+        self.imgPhone = ImageTk.PhotoImage(self.phone)
+
+        self.email_path = "email.png"
+        self.email = Image.open(self.email_path)
+        self.email = self.email.resize((20, 20), Image.LANCZOS)
+        self.imgEmail = ImageTk.PhotoImage(self.email)
+
+        self.password_path = "password.png"
+        self.password = Image.open(self.password_path)
+        self.password = self.password.resize((20, 20), Image.LANCZOS)
+        self.imgPassword = ImageTk.PhotoImage(self.password)
 
     def load_users(self):
         try:
@@ -261,6 +280,14 @@ class BankingApplication:
             self.entry_password.configure(show='')
             self.password_visibility_button.configure(image=self.imgHide)
 
+    def toggle_password_visibility2(self):
+        if self.entry_confirmPassword.cget('show') == '':
+            self.entry_confirmPassword.configure(show='*')
+            self.confirm_password_visibility_button2.configure(image=self.imgShow)
+        else:
+            self.entry_confirmPassword.configure(show='')
+            self.confirm_password_visibility_button2.configure(image=self.imgHide)
+
     def open_registration_window(self):
         self.clear_current_frame()
 
@@ -273,26 +300,62 @@ class BankingApplication:
         self.label_ID = customtkinter.CTkLabel(registration_frame, text="ID Number:")
         self.label_ID.pack()
 
-        self.entry_ID = customtkinter.CTkEntry(registration_frame)
-        self.entry_ID.pack()
+        ID_frame = customtkinter.CTkFrame(registration_frame, fg_color="transparent")
+        ID_frame.pack()
 
-        self.label_DOB = customtkinter.CTkLabel(registration_frame, text="Date of Birth (DD/MM/YYYY):")
+        self.ID_visibility_button = customtkinter.CTkButton(ID_frame, image=self.imgUser,
+                                                                  text="",
+                                                                  width=20, height=20, fg_color="transparent",
+                                                                  bg_color="transparent", hover=False)
+        self.ID_visibility_button.pack(side="left", padx=(0, 0))
+
+        self.entry_ID = customtkinter.CTkEntry(ID_frame)
+        self.entry_ID.pack(side="left", padx=(0, 35))
+
+        self.label_DOB = customtkinter.CTkLabel(registration_frame, text="DOB (DD/MM/YYYY):")
         self.label_DOB.pack()
 
-        self.entry_DOB = customtkinter.CTkEntry(registration_frame)
-        self.entry_DOB.pack()
+        DOB_frame = customtkinter.CTkFrame(registration_frame, fg_color="transparent")
+        DOB_frame.pack()
+
+        self.DOB_visibility_button = customtkinter.CTkButton(DOB_frame, image=self.imgUser,
+                                                                  text="",
+                                                                  width=20, height=20, fg_color="transparent",
+                                                                  bg_color="transparent", hover=False)
+        self.DOB_visibility_button.pack(side="left", padx=(0, 0))
+
+        self.entry_DOB = customtkinter.CTkEntry(DOB_frame)
+        self.entry_DOB.pack(side="left", padx=(0, 35))
 
         self.label_contact = customtkinter.CTkLabel(registration_frame, text="Contact Number:")
         self.label_contact.pack()
 
-        self.entry_contact = customtkinter.CTkEntry(registration_frame)
-        self.entry_contact.pack()
+        contact_frame = customtkinter.CTkFrame(registration_frame, fg_color="transparent")
+        contact_frame.pack()
+
+        self.contact_visibility_button = customtkinter.CTkButton(contact_frame, image=self.imgPhone,
+                                                                  text="",
+                                                                  width=20, height=20, fg_color="transparent",
+                                                                  bg_color="transparent", hover=False)
+        self.contact_visibility_button.pack(side="left", padx=(0, 0))
+
+        self.entry_contact = customtkinter.CTkEntry(contact_frame)
+        self.entry_contact.pack(side="left", padx=(0, 35))
 
         self.label_email = customtkinter.CTkLabel(registration_frame, text="Email:")
         self.label_email.pack()
 
-        self.entry_email = customtkinter.CTkEntry(registration_frame)
-        self.entry_email.pack()
+        email_frame = customtkinter.CTkFrame(registration_frame, fg_color="transparent")
+        email_frame.pack()
+
+        self.email_visibility_button = customtkinter.CTkButton(email_frame, image=self.imgEmail,
+                                                                  text="",
+                                                                  width=20, height=20, fg_color="transparent",
+                                                                  bg_color="transparent", hover=False)
+        self.email_visibility_button.pack(side="left", padx=(0, 0))
+
+        self.entry_email = customtkinter.CTkEntry(email_frame)
+        self.entry_email.pack(side="left", padx=(0, 35))
 
         self.label_password = customtkinter.CTkLabel(registration_frame, text="Password:")
         self.label_password.pack()
@@ -300,8 +363,14 @@ class BankingApplication:
         password_frame = customtkinter.CTkFrame(registration_frame, fg_color="transparent")
         password_frame.pack()
 
+        self.password_button = customtkinter.CTkButton(password_frame, image=self.imgPassword,
+                                                                  command=self.toggle_password_visibility, text="",
+                                                                  width=20, height=20, fg_color="transparent",
+                                                                  bg_color="transparent", hover=False)
+        self.password_button.pack(side="left", padx=(0, 0))
+
         self.entry_password = customtkinter.CTkEntry(password_frame, show="*")
-        self.entry_password.pack(side="left", padx=(35, 0))
+        self.entry_password.pack(side="left", padx=(0, 0))
 
         self.password_visibility_button = customtkinter.CTkButton(password_frame, image=self.imgShow,
                                                                   command=self.toggle_password_visibility, text="",
@@ -312,8 +381,23 @@ class BankingApplication:
         self.label_confirmPassword = customtkinter.CTkLabel(registration_frame, text="Confirm Password:")
         self.label_confirmPassword.pack()
 
-        self.entry_confirmPassword = customtkinter.CTkEntry(registration_frame, show="*")
-        self.entry_confirmPassword.pack()
+        confirm_password_frame = customtkinter.CTkFrame(registration_frame, fg_color="transparent")
+        confirm_password_frame.pack()
+
+        self.confirm_password_visibility_button = customtkinter.CTkButton(confirm_password_frame, image=self.imgPassword,
+                                                                  text="",
+                                                                  width=20, height=20, fg_color="transparent",
+                                                                  bg_color="transparent", hover=False)
+        self.confirm_password_visibility_button.pack(side="left", padx=(0, 0))
+
+        self.entry_confirmPassword = customtkinter.CTkEntry(confirm_password_frame, show="*")
+        self.entry_confirmPassword.pack(side="left", padx=(0, 0))
+
+        self.confirm_password_visibility_button2 = customtkinter.CTkButton(confirm_password_frame, image=self.imgShow,
+                                                                  command=self.toggle_password_visibility2, text="",
+                                                                  width=20, height=20, fg_color="transparent",
+                                                                  bg_color="transparent", hover=False)
+        self.confirm_password_visibility_button2.pack(side="left", padx=(0, 0))
 
         self.var_generate_password = tk.BooleanVar()
         self.checkbutton_generate_password = customtkinter.CTkCheckBox(registration_frame, text="Generate password",
@@ -364,8 +448,17 @@ class BankingApplication:
         self.label_email = customtkinter.CTkLabel(login_frame, text="Email:")
         self.label_email.pack()
 
-        self.entry_email = customtkinter.CTkEntry(login_frame)
-        self.entry_email.pack()
+        email_frame = customtkinter.CTkFrame(login_frame, fg_color="transparent")
+        email_frame.pack()
+
+        self.email_visibility_button = customtkinter.CTkButton(email_frame, image=self.imgEmail,
+                                                                  text="",
+                                                                  width=20, height=20, fg_color="transparent",
+                                                                  bg_color="transparent", hover=False)
+        self.email_visibility_button.pack(side="left", padx=(0, 0))
+
+        self.entry_email = customtkinter.CTkEntry(email_frame)
+        self.entry_email.pack(side="left", padx=(0, 35))
 
         self.label_password = customtkinter.CTkLabel(login_frame, text="Password:")
         self.label_password.pack()
@@ -373,8 +466,14 @@ class BankingApplication:
         password_frame = customtkinter.CTkFrame(login_frame, fg_color="transparent")
         password_frame.pack()
 
+        self.password_button = customtkinter.CTkButton(password_frame, image=self.imgPassword,
+                                                                  command=self.toggle_password_visibility, text="",
+                                                                  width=20, height=20, fg_color="transparent",
+                                                                  bg_color="transparent", hover=False)
+        self.password_button.pack(side="left", padx=(0, 0))
+
         self.entry_password = customtkinter.CTkEntry(password_frame, show="*")
-        self.entry_password.pack(side="left", padx=(35, 0))
+        self.entry_password.pack(side="left", padx=(0, 0))
 
         self.password_visibility_button = customtkinter.CTkButton(password_frame, image=self.imgShow,
                                                                   command=self.toggle_password_visibility, text="",
