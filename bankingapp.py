@@ -18,6 +18,7 @@ import threading
 customtkinter.set_appearance_mode("Light")
 customtkinter.set_default_color_theme("themes/red.json")
 
+
 class User:
     def __init__(self, email, password, account_number, contact, ID, dob):
         self.email = email
@@ -28,6 +29,7 @@ class User:
         self.ID = ID
         self.contact = contact
         self.dob = dob
+
 
 class BankingApplication:
     def __init__(self, root):
@@ -57,13 +59,13 @@ class BankingApplication:
             with open("UserData.txt", "r") as file:
                 for line in file:
                     data = line.strip().split(",")
-                    if len(data) == 7:  
-                        email, password, account_number, balance, ID,  contact, dob = data
-                        self.users[email] = User(email, password, account_number, ID,  contact, dob, )
-                        self.users[email].balance = float(balance) 
+                    if len(data) == 7:
+                        email, password, account_number, balance, ID, contact, dob = data
+                        self.users[email] = User(email, password, account_number, ID, contact, dob, )
+                        self.users[email].balance = float(balance)
                     elif len(data) == 6:
-                        email, password, account_number, ID,  contact, dob = data
-                        self.users[email] = User(email, password, account_number, ID,  contact, dob)
+                        email, password, account_number, ID, contact, dob = data
+                        self.users[email] = User(email, password, account_number, ID, contact, dob)
                     self.load_transaction_history(email)
         except FileNotFoundError:
             pass
@@ -71,7 +73,8 @@ class BankingApplication:
     def save_users(self):
         with open("UserData.txt", "w") as file:
             for user in self.users.values():
-                file.write(f"{user.email},{user.password},{user.account_number},{user.balance}, {user.ID},{user.contact},{user.dob}\n")
+                file.write(
+                    f"{user.email},{user.password},{user.account_number},{user.balance}, {user.ID},{user.contact},{user.dob}\n")
 
     def load_transaction_history(self, email):
         try:
@@ -86,8 +89,6 @@ class BankingApplication:
         except FileNotFoundError:
             pass
 
-
-
     def save_transaction_log(self, email, transaction_details):
         with open("Transactionlog.txt", "a") as file:
             file.write(f"{email},{transaction_details}\n")
@@ -101,7 +102,7 @@ class BankingApplication:
         if account_number == self.logged_in_user.account_number:
             self.error_label_transfer.configure(text="You cannot transfer to yourself. Nice try")
             return
-        
+
         if not amount_str.strip() or not amount_str.isdigit() or float(amount_str) <= 0:
             self.error_label_transfer.configure(text="Please enter a valid amount.")
             return
@@ -123,15 +124,21 @@ class BankingApplication:
         recipient.balance += amount
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.logged_in_user.transactions.append(f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}")
-        recipient.transactions.append(f"Received R{amount:.2f} from {self.logged_in_user.account_number} on {timestamp}")
+        self.logged_in_user.transactions.append(
+            f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}")
+        recipient.transactions.append(
+            f"Received R{amount:.2f} from {self.logged_in_user.account_number} on {timestamp}")
 
         self.save_users()
-        self.save_transaction_log(self.logged_in_user.email, f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}")
-        self.save_transaction_log(recipient.email, f"Received R{amount:.2f} from {self.logged_in_user.account_number} on {timestamp}")
+        self.save_transaction_log(self.logged_in_user.email,
+                                  f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}")
+        self.save_transaction_log(recipient.email,
+                                  f"Received R{amount:.2f} from {self.logged_in_user.account_number} on {timestamp}")
 
         self.error_label_transfer.configure(text="Transfer successful.", text_color="green")
-        self.create_popup("Transfer Successful", f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}", page=self.open_dashboard)
+        self.create_popup("Transfer Successful",
+                          f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}",
+                          page=self.open_dashboard)
 
     def process_loan(self):
         amount_str = self.entry_loan_amount.get()
@@ -145,7 +152,7 @@ class BankingApplication:
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         transaction_details = f"Loan of R{amount:.2f} received on {timestamp}"
-        
+
         self.logged_in_user.transactions.append(f"{self.logged_in_user.email}, {transaction_details}")
 
         self.save_users()
@@ -164,23 +171,24 @@ class BankingApplication:
     def create_main_window(self):
         self.clear_current_frame()
         self.root.configure(bg="red")
-        self.label_main = customtkinter.CTkLabel(self.root, text="Welcome to NexBank!", font=("Helvetica", 25), text_color= "red")
+        self.label_main = customtkinter.CTkLabel(self.root, text="Welcome to NexBank!", font=("Verdana", 25),
+                                                 text_color="#B22E2E")
         self.label_main.pack(pady=20)
 
-
-        image = PhotoImage(file="Nex3.png")
+        image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(1, 1)
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
 
-        self.button_login = customtkinter.CTkButton(self.root, text="Login", command=self.open_login_window)
+        self.button_login = customtkinter.CTkButton(self.root, text="Login", command=self.open_login_window, corner_radius=32)
         self.button_login.pack(pady=10)
 
-        self.button_register = customtkinter.CTkButton(self.root, text="Register", command=self.open_registration_window)
+        self.button_register = customtkinter.CTkButton(self.root, text="Register",
+                                                       command=self.open_registration_window, corner_radius=32)
         self.button_register.pack()
 
-        self.button_quit = customtkinter.CTkButton(self.root, text="Quit", command=self.quit_application)
+        self.button_quit = customtkinter.CTkButton(self.root, text="Quit", command=self.quit_application, corner_radius=32)
         self.button_quit.pack(pady=10)
 
         self.error_label = customtkinter.CTkLabel(self.root, text="", text_color="red")
@@ -207,7 +215,7 @@ class BankingApplication:
     def open_registration_window(self):
         self.clear_current_frame()
 
-        self.label_title = customtkinter.CTkLabel(self.root, text="Register", font=("Helvetica", 25), text_color="red")
+        self.label_title = customtkinter.CTkLabel(self.root, text="Register", font=("Helvetica", 25), text_color="#B22E2E")
         self.label_title.pack(pady=10)
 
         registration_frame = customtkinter.CTkFrame(self.root)
@@ -246,7 +254,10 @@ class BankingApplication:
         self.entry_password = customtkinter.CTkEntry(password_frame, show="*")
         self.entry_password.pack(side="left", padx=(35, 0))
 
-        self.password_visibility_button = customtkinter.CTkButton(password_frame, image=self.imgShow, command=self.toggle_password_visibility, text="", width=20, height=20, fg_color="transparent", bg_color="transparent", hover=False)
+        self.password_visibility_button = customtkinter.CTkButton(password_frame, image=self.imgShow,
+                                                                  command=self.toggle_password_visibility, text="",
+                                                                  width=20, height=20, fg_color="transparent",
+                                                                  bg_color="transparent", hover=False)
         self.password_visibility_button.pack(side="left", padx=(0, 0))
 
         self.label_confirmPassword = customtkinter.CTkLabel(registration_frame, text="Confirm Password:")
@@ -256,16 +267,18 @@ class BankingApplication:
         self.entry_confirmPassword.pack()
 
         self.var_generate_password = tk.BooleanVar()
-        self.checkbutton_generate_password = customtkinter.CTkCheckBox(registration_frame, text="Generate password", variable=self.var_generate_password, command=self.toggle_password_entry)
+        self.checkbutton_generate_password = customtkinter.CTkCheckBox(registration_frame, text="Generate password",
+                                                                       variable=self.var_generate_password,
+                                                                       command=self.toggle_password_entry)
         self.checkbutton_generate_password.pack(pady=(10), padx=10)
 
         self.error_label_reg = customtkinter.CTkLabel(registration_frame, text="", text_color="red")
         self.error_label_reg.pack(padx=10)
 
-        self.button_register = customtkinter.CTkButton(registration_frame, text="Register", command=self.register_user)
+        self.button_register = customtkinter.CTkButton(registration_frame, text="Register", command=self.register_user, corner_radius=32)
         self.button_register.pack(pady=(5, 30), padx=100)
 
-        self.button_back = customtkinter.CTkButton(registration_frame, text="Back", command=self.create_main_window)
+        self.button_back = customtkinter.CTkButton(registration_frame, text="Back", command=self.create_main_window, corner_radius=32)
         self.button_back.pack(pady=(5, 30), padx=100)
 
         self.center_window(450, 650)
@@ -293,7 +306,7 @@ class BankingApplication:
     def open_login_window(self):
         self.clear_current_frame()
 
-        self.label_title = customtkinter.CTkLabel(self.root, text="Login", font=("Helvetica", 25), text_color="red")
+        self.label_title = customtkinter.CTkLabel(self.root, text="Login", font=("Helvetica", 25), text_color="#B22E2E")
         self.label_title.pack(pady=10)
 
         login_frame = customtkinter.CTkFrame(self.root)
@@ -314,17 +327,19 @@ class BankingApplication:
         self.entry_password = customtkinter.CTkEntry(password_frame, show="*")
         self.entry_password.pack(side="left", padx=(35, 0))
 
-        self.password_visibility_button = customtkinter.CTkButton(password_frame, image=self.imgShow, command=self.toggle_password_visibility, text="", width=20, height=20, fg_color="transparent", bg_color="transparent", hover=False)
+        self.password_visibility_button = customtkinter.CTkButton(password_frame, image=self.imgShow,
+                                                                  command=self.toggle_password_visibility, text="",
+                                                                  width=20, height=20, fg_color="transparent",
+                                                                  bg_color="transparent", hover=False)
         self.password_visibility_button.pack(side="left", padx=(0, 0))
-
 
         self.error_label = customtkinter.CTkLabel(login_frame, text="", text_color="red")
         self.error_label.pack(padx=10)
 
-        self.button_login = customtkinter.CTkButton(login_frame, text="Login", command=self.login_user)
+        self.button_login = customtkinter.CTkButton(login_frame, text="Login", command=self.login_user, corner_radius=32)
         self.button_login.pack(pady=(5, 30), padx=100)
 
-        self.button_back = customtkinter.CTkButton(login_frame, text="Back", command=self.create_main_window)
+        self.button_back = customtkinter.CTkButton(login_frame, text="Back", command=self.create_main_window, corner_radius=32)
         self.button_back.pack(pady=(5, 30), padx=100)
 
         self.center_window(450, 550)
@@ -339,7 +354,7 @@ class BankingApplication:
 
     def send_registration_email(self, email, password):
         sender_email = "sewparsad60@gmail.com"
-        sender_password = "xahk ahrn vvyl lgua" 
+        sender_password = "xahk ahrn vvyl lgua"
         subject = "NexBank Registration Successful"
         body = f"Dear User,\n\nThank you for registering with NexBank.\n\nYour login details are as follows:\nEmail: {email}\nPassword: {password}\n\nPlease keep this information secure.\n\nBest regards,\nNexBank Team"
         msg = MIMEMultipart()
@@ -393,15 +408,15 @@ class BankingApplication:
         if age < 18:
             self.error_label_reg.configure(text="You must be older than 18 years to register.")
             return
-        
+
         if not ID.isdigit():
             self.error_label_reg.configure(text="Please enter a valid ID Number")
             return
-        
+
         if len(ID) != 13:
             self.error_label_reg.configure(text="Please enter a 13-digit ID Number")
             return
-        
+
         if not contact.isdigit():
             self.error_label_reg.configure(text="Please enter a valid South African phone number")
             return
@@ -409,7 +424,7 @@ class BankingApplication:
         if len(contact) != 10:
             self.error_label_reg.configure(text="Please enter a 10-digit South African phone number.")
             return
-        
+
         email = self.entry_email.get()
         email = email.lower()
 
@@ -420,7 +435,7 @@ class BankingApplication:
         if email in self.users:
             self.error_label_reg.configure(text="Email already registered. Please try a different email.")
             return
-        
+
         if ID in self.users:
             self.error_label_reg.configure(text="There is already an account with this ID Number.")
             return
@@ -434,9 +449,10 @@ class BankingApplication:
         else:
             password = self.entry_password.get()
             if not self.is_strong_password(password):
-                self.error_label_reg.configure(text="Password is not strong. \nPlease include lowercase, uppercase, digits, and symbols.")
+                self.error_label_reg.configure(
+                    text="Password is not strong. \nPlease include lowercase, uppercase, digits, and symbols.")
                 return
-        
+
         if password != self.entry_confirmPassword.get():
             self.error_label_reg.configure(text="Passwords do not match.")
             return
@@ -446,19 +462,23 @@ class BankingApplication:
         self.users[email] = user
         self.save_users()
         self.send_registration_email(email, password)
-        
-        self.create_popup("Register Successful", "Please check your email for your credentials. \nYou will be able to login now.", page=self.open_login_window)
+
+        self.create_popup("Register Successful",
+                          "Please check your email for your credentials. \nYou will be able to login now.",
+                          page=self.open_login_window)
 
     def show_registration_success_window(self, generated_password):
         self.clear_current_frame()
 
-        label_success = customtkinter.CTkLabel(self.root, text="Registration Successful!", font=("Helvetica", 20), text_color="green")
+        label_success = customtkinter.CTkLabel(self.root, text="Registration Successful!", font=("Helvetica", 20),
+                                               text_color="green")
         label_success.pack(pady=10)
 
-        label_password = customtkinter.CTkLabel(self.root, text=f"You will be able to login now.", font=("Helvetica", 15))
+        label_password = customtkinter.CTkLabel(self.root, text=f"You will be able to login now.",
+                                                font=("Helvetica", 15))
         label_password.pack(pady=5)
 
-        button_ok = customtkinter.CTkButton(self.root, text="OK", command=self.register_ok)
+        button_ok = customtkinter.CTkButton(self.root, text="OK", command=self.register_ok, corner_radius=32)
         button_ok.pack(pady=20)
 
         self.center_window(450, 150)
@@ -476,31 +496,33 @@ class BankingApplication:
 
     def open_dashboard(self):
         self.clear_current_frame()
-        image = PhotoImage(file="Nex3.png")
+        image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(2, 2)
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
 
-        self.label_title = customtkinter.CTkLabel(self.root, text="Dashboard", font=("Helvetica", 25), text_color="red")
+        self.label_title = customtkinter.CTkLabel(self.root, text="Dashboard", font=("Helvetica", 25), text_color="#B22E2E")
         self.label_title.pack(pady=10)
 
-        self.button_balance = customtkinter.CTkButton(self.root, text="View Balance", command=self.view_balance)
+        self.button_balance = customtkinter.CTkButton(self.root, text="View Balance", command=self.view_balance, corner_radius=32)
         self.button_balance.pack(pady=10)
 
-        self.button_transfer = customtkinter.CTkButton(self.root, text="Transfer Money", command=self.transfer_money)
+        self.button_transfer = customtkinter.CTkButton(self.root, text="Transfer Money", command=self.transfer_money, corner_radius=32)
         self.button_transfer.pack(pady=10)
 
-        self.button_statement = customtkinter.CTkButton(self.root, text="View Bank Statement", command=self.view_statement)
+        self.button_statement = customtkinter.CTkButton(self.root, text="View Bank Statement",
+                                                        command=self.view_statement, corner_radius=32)
         self.button_statement.pack(pady=10)
 
-        self.button_loan = customtkinter.CTkButton(self.root, text="Take Loan/Overdraft", command=self.take_loan)
+        self.button_loan = customtkinter.CTkButton(self.root, text="Take Loan/Overdraft", command=self.take_loan, corner_radius=32)
         self.button_loan.pack(pady=10)
 
-        self.button_personal_details = customtkinter.CTkButton(self.root, text="View Personal Details", command=self.view_personal_details)
+        self.button_personal_details = customtkinter.CTkButton(self.root, text="View Personal Details",
+                                                               command=self.view_personal_details, corner_radius=32)
         self.button_personal_details.pack(pady=10)
 
-        self.button_logout = customtkinter.CTkButton(self.root, text="Logout", command=self.create_main_window)
+        self.button_logout = customtkinter.CTkButton(self.root, text="Logout", command=self.create_main_window, corner_radius=32)
         self.button_logout.pack(pady=10)
 
         self.center_window(450, 650)
@@ -508,16 +530,17 @@ class BankingApplication:
     def view_balance(self):
         self.clear_current_frame()
 
-        image = PhotoImage(file="Nex3.png")
+        image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(2, 2)
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
 
-        label_balance = customtkinter.CTkLabel(self.root, text=f"Your Balance: R{self.logged_in_user.balance:.2f}", font=("Helvetica", 20))
+        label_balance = customtkinter.CTkLabel(self.root, text=f"Your Balance: R{self.logged_in_user.balance:.2f}",
+                                               font=("Helvetica", 20))
         label_balance.pack(pady=20)
 
-        button_back = customtkinter.CTkButton(self.root, text="Back", command=self.open_dashboard)
+        button_back = customtkinter.CTkButton(self.root, text="Back", command=self.open_dashboard, corner_radius=32)
         button_back.pack(pady=10)
 
         self.center_window(450, 550)
@@ -525,12 +548,13 @@ class BankingApplication:
     def transfer_money(self):
         self.clear_current_frame()
 
-        image = PhotoImage(file="Nex3.png")
+        image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(2, 2)
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
-        self.label_title = customtkinter.CTkLabel(self.root, text="Transfer Money", font=("Helvetica", 25), text_color="red")
+        self.label_title = customtkinter.CTkLabel(self.root, text="Transfer Money", font=("Helvetica", 25),
+                                                  text_color="#B22E2E")
         self.label_title.pack(pady=10)
 
         transfer_frame = customtkinter.CTkFrame(self.root)
@@ -551,10 +575,10 @@ class BankingApplication:
         self.error_label_transfer = customtkinter.CTkLabel(transfer_frame, text="", text_color="red")
         self.error_label_transfer.pack(padx=10)
 
-        button_transfer = customtkinter.CTkButton(transfer_frame, text="Transfer", command=self.process_transfer)
+        button_transfer = customtkinter.CTkButton(transfer_frame, text="Transfer", command=self.process_transfer, corner_radius=32)
         button_transfer.pack(pady=(5, 30), padx=100)
 
-        button_back = customtkinter.CTkButton(transfer_frame, text="Back", command=self.open_dashboard)
+        button_back = customtkinter.CTkButton(transfer_frame, text="Back", command=self.open_dashboard, corner_radius=32)
         button_back.pack(pady=(5, 30), padx=100)
 
         self.center_window(450, 550)
@@ -563,13 +587,13 @@ class BankingApplication:
         self.clear_current_frame()
         self.load_transaction_history(self.logged_in_user.email)
 
-        image = PhotoImage(file="Nex3.png")
+        image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(2, 2)
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
 
-        label_title = customtkinter.CTkLabel(self.root, text="Bank Statement", font=("Helvetica", 25), text_color="red")
+        label_title = customtkinter.CTkLabel(self.root, text="Bank Statement", font=("Helvetica", 25),  text_color="#B22E2E")
         label_title.pack(pady=10, padx=100)
 
         canvas = Canvas(self.root, borderwidth=0, highlightthickness=0)
@@ -595,10 +619,11 @@ class BankingApplication:
         self.error_label_pdf = customtkinter.CTkLabel(frame, text="", text_color="red")
         self.error_label_pdf.pack(padx=(30, 0))
 
-        self.button_download = customtkinter.CTkButton(frame, text="Download as PDF", command=self.start_download_thread)
+        self.button_download = customtkinter.CTkButton(frame, text="Download as PDF",
+                                                       command=self.start_download_thread, corner_radius=32)
         self.button_download.pack(pady=10, padx=(30, 0))
 
-        button_back = customtkinter.CTkButton(frame, text="Back", command=self.open_dashboard)
+        button_back = customtkinter.CTkButton(frame, text="Back", command=self.open_dashboard, corner_radius=32)
         button_back.pack(pady=10, padx=(30, 0))
 
         self.center_window(450, 550)
@@ -624,7 +649,7 @@ class BankingApplication:
 
         c = canvas.Canvas(pdf_filename, pagesize=letter)
 
-        logo_path = "Nex2.png"
+        logo_path = "nexbank.png"
         c.drawImage(logo_path, 50, 650, width=100, height=100)
 
         c.setFont("Helvetica", 12)
@@ -656,7 +681,7 @@ class BankingApplication:
 
                 if y_position < max_y:
                     c.showPage()
-                    logo_path = "Nex2.png"
+                    logo_path = "nexbank.png"
                     c.drawImage(logo_path, 50, 650, width=100, height=100)
                     c.setFont("Helvetica-Bold", 16)
                     c.drawString(50, 600, "Continued Transaction History")
@@ -670,19 +695,19 @@ class BankingApplication:
         c.save()
         print(f"Transaction history saved to {pdf_filename}")
 
-
     def take_loan(self):
         self.clear_current_frame()
 
-        image = PhotoImage(file="Nex3.png")
+        image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(2, 2)
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
 
-        label_title = customtkinter.CTkLabel(self.root, text="Bank Statement", font=("Helvetica", 25), text_color="red")
+        label_title = customtkinter.CTkLabel(self.root, text="Bank Statement", font=("Helvetica", 25), text_color="#B22E2E")
         label_title.pack(pady=10)
-        self.label_title = customtkinter.CTkLabel(self.root, text="Take Loan/Overdraft", font=("Helvetica", 25), text_color="red")
+        self.label_title = customtkinter.CTkLabel(self.root, text="Take Loan/Overdraft", font=("Helvetica", 25),
+                                                  text_color="#B22E2E")
         self.label_title.pack(pady=10)
 
         loan_frame = customtkinter.CTkFrame(self.root)
@@ -697,10 +722,10 @@ class BankingApplication:
         self.error_label_loan = customtkinter.CTkLabel(loan_frame, text="", text_color="red")
         self.error_label_loan.pack(padx=10)
 
-        button_loan = customtkinter.CTkButton(loan_frame, text="Apply", command=self.process_loan)
+        button_loan = customtkinter.CTkButton(loan_frame, text="Apply", command=self.process_loan, corner_radius=32)
         button_loan.pack(pady=(5, 30), padx=100)
 
-        button_back = customtkinter.CTkButton(loan_frame, text="Back", command=self.open_dashboard)
+        button_back = customtkinter.CTkButton(loan_frame, text="Back", command=self.open_dashboard, corner_radius=32)
         button_back.pack(pady=(5, 30), padx=100)
 
         self.center_window(450, 550)
@@ -708,13 +733,14 @@ class BankingApplication:
     def view_personal_details(self):
         self.clear_current_frame()
 
-        image = PhotoImage(file="Nex3.png")
+        image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(2, 2)
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
 
-        label_title = customtkinter.CTkLabel(self.root, text="Personal Details", font=("Helvetica", 25), text_color="red")
+        label_title = customtkinter.CTkLabel(self.root, text="Personal Details", font=("Helvetica", 25),
+                                             text_color="#B22E2E")
         label_title.pack(pady=10)
 
         details_frame = customtkinter.CTkFrame(self.root)
@@ -723,7 +749,8 @@ class BankingApplication:
         label_email = customtkinter.CTkLabel(details_frame, text=f"ID Number: {self.logged_in_user.ID}")
         label_email.pack()
 
-        label_account_number = customtkinter.CTkLabel(details_frame, text=f"Account Number: {self.logged_in_user.account_number}")
+        label_account_number = customtkinter.CTkLabel(details_frame,
+                                                      text=f"Account Number: {self.logged_in_user.account_number}")
         label_account_number.pack()
 
         label_email = customtkinter.CTkLabel(details_frame, text=f"Contact Number: {self.logged_in_user.contact}")
@@ -738,7 +765,7 @@ class BankingApplication:
         label_balance = customtkinter.CTkLabel(details_frame, text=f"Balance: R{self.logged_in_user.balance:.2f}")
         label_balance.pack()
 
-        button_back = customtkinter.CTkButton(details_frame, text="Back", command=self.open_dashboard)
+        button_back = customtkinter.CTkButton(details_frame, text="Back", command=self.open_dashboard, corner_radius=32)
         button_back.pack(pady=10, padx=100)
 
         self.center_window(450, 550)
@@ -758,7 +785,7 @@ class BankingApplication:
         label_message = customtkinter.CTkLabel(popup, text=message, font=("Helvetica", 12), text_color=text_color)
         label_message.pack(pady=10)
 
-        button_ok = customtkinter.CTkButton(popup, text="OK", command=page)
+        button_ok = customtkinter.CTkButton(popup, text="OK", command=page, corner_radius=32)
         button_ok.pack(pady=10, padx=100)
 
         self.center_window(550, 300)
@@ -769,10 +796,11 @@ class BankingApplication:
         has_digit = any(c.isdigit() for c in password)
         has_special = any(c in string.punctuation for c in password)
         return len(password) >= 8 and has_lower and has_upper and has_digit and has_special
-    
+
     def start_download_thread(self):
         download_thread = threading.Thread(target=self.download_transaction_history)
         download_thread.start()
+
 
 if __name__ == "__main__":
     root = customtkinter.CTk()
