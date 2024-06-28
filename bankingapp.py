@@ -476,9 +476,9 @@ class BankingApplication:
         self.entry_password.pack(side="left", padx=(0, 0))
 
         self.password_visibility_button = customtkinter.CTkButton(password_frame, image=self.imgShow,
-                                                                  command=self.toggle_password_visibility, text="",
-                                                                  width=20, height=20, fg_color="transparent",
-                                                                  bg_color="transparent", hover=False)
+                                                                command=self.toggle_password_visibility, text="",
+                                                                width=20, height=20, fg_color="transparent",
+                                                                bg_color="transparent", hover=False)
         self.password_visibility_button.pack(side="left", padx=(0, 0))
 
         self.error_label = customtkinter.CTkLabel(login_frame, text="", text_color="red")
@@ -487,10 +487,67 @@ class BankingApplication:
         self.button_login = customtkinter.CTkButton(login_frame, text="Login", command=self.login_user, corner_radius=32)
         self.button_login.pack(pady=(5, 30), padx=100)
 
+        self.button_forgot_password = customtkinter.CTkButton(login_frame, text="Forgot Password", command=self.forgot_password, corner_radius=32)
+        self.button_forgot_password.pack(pady=(5, 30), padx=100)
+
         self.button_back = customtkinter.CTkButton(login_frame, text="Back", command=self.create_main_window, corner_radius=32)
         self.button_back.pack(pady=(5, 30), padx=100)
 
         self.center_window(450, 550)
+        
+    def forgot_password(self):
+        email = self.entry_email.get().strip()
+
+        if not email:
+            self.error_label.configure(text="Please enter your email address.")
+            return
+
+        user = self.users.get(email)
+        if not user:
+            self.error_label.configure(text="Email address not found.")
+            return
+
+        # Generate a new temporary password
+        new_password = self.generate_temporary_password()
+        user.password = new_password
+
+        # Send email with new password
+        self.send_reset_email(email, new_password)
+
+        # Save the updated user data
+        self.save_users()
+
+        self.error_label.configure(text="A new password has been sent to your email.", text_color="green")
+
+    def generate_temporary_password(self, length=8):
+        import random
+        import string
+
+        characters = string.ascii_letters + string.digits + string.punctuation
+        return ''.join(random.choice(characters) for i in range(length))
+
+    def send_reset_email(self, recipient_email, new_password):
+        sender_email = "sewparsad60@gmail.com"  # Replace with your email
+        sender_password = "xahk ahrn vvyl lgua"  # Replace with your email password
+        subject = " NexBank Password Reset"
+
+        message = MIMEMultipart()
+        message['From'] =  "Nex Bank"
+        message['To'] = recipient_email
+        message['Subject'] = subject
+
+        body = f"Dear NexBank Customer,\n\n Your new password is: {new_password}\n\nPlease apply your new password when logging in.\n\nBest regards,\nNexBank Team"
+        message.attach(MIMEText(body, 'plain'))
+
+        try:
+            server = smtplib.SMTP('smtp.gmail.com', 587)  # Replace with your SMTP server and port
+            server.starttls()
+            server.login(sender_email, sender_password)
+            text = message.as_string()
+            server.sendmail(sender_email, recipient_email, text)
+            server.quit()
+        except Exception as e:
+            self.error_label.configure(text=f"Failed to send email: {str(e)}")
 
     def return_to_main_window(self):
         self.clear_current_frame()
