@@ -28,3 +28,23 @@ nurudeenarnold@gmail.com,Loan of R1.00 received on 2024-06-20 22:03:52
 nurudeenarnold@gmail.com,Loan of R1.00 received on 2024-06-20 22:03:54
 nurudeenarnold@gmail.com,Loan of R12.00 received on 2024-06-20 23:29:44
 nurudeenarnold@gmail.com,Loan of R500.00 received on 2024-06-28 09:54:19
+ammaarahfakier01@gmail.com,Loan of R2500000.00 received on 2024-06-28 13:16:05
+ammaarahfakier01@gmail.com,Transferred R250000.00 to 8825809069 on 2024-06-28 13:32:03
+nurudeenarnold@gmail.com,Received R250000.00 from 9862964949 on 2024-06-28 13:32:03
+ammaarahfakier01@gmail.com,Transferred R2225000.00 to 8825809069 on 2024-06-28 13:32:42
+nurudeenarnold@gmail.com,Received R2225000.00 from 9862964949 on 2024-06-28 13:32:42
+ammaarahfakier01@gmail.com,Transferred R2500.00 to 8825809069 on 2024-06-28 13:33:07
+nurudeenarnold@gmail.com,Received R2500.00 from 9862964949 on 2024-06-28 13:33:07
+ammaarahfakier01@gmail.com,Transferred R2400.00 to 8825809069 on 2024-06-28 13:33:28
+nurudeenarnold@gmail.com,Received R2400.00 from 9862964949 on 2024-06-28 13:33:28
+ammaarahfakier01@gmail.com,Transferred R2020.00 to 8825809069 on 2024-06-28 13:34:00
+nurudeenarnold@gmail.com,Received R2020.00 from 9862964949 on 2024-06-28 13:34:00
+ammaarahfakier01@gmail.com,Transferred R17000.00 to 8825809069 on 2024-06-28 13:34:14
+nurudeenarnold@gmail.com,Received R17000.00 from 9862964949 on 2024-06-28 13:34:14
+ammaarahfakier01@gmail.com,Transferred R900.00 to 8825809069 on 2024-06-28 13:34:25
+nurudeenarnold@gmail.com,Received R900.00 from 9862964949 on 2024-06-28 13:34:25
+ammaarahfakier01@gmail.com,Transferred R80.00 to 8825809069 on 2024-06-28 13:39:40, Bank Charges: R10.00
+nurudeenarnold@gmail.com,Received R80.00 from 9862964949 on 2024-06-28 13:39:40
+nurudeenarnold@gmail.com,Transferred R10000.00 to 9862964949 on 2024-06-28 13:41:37, Bank Charges: R10.00
+ammaarahfakier01@gmail.com,Received R10000.00 from 8825809069 on 2024-06-28 13:41:37
+nurudeenarnold@gmail.com,Loan of R500.00 received on 2024-06-28 13:41:50, Bank Charges: R50.00

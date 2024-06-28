@@ -94,70 +94,119 @@ class BankingApplication:
             file.write(f"{email},{transaction_details}\n")
 
     def process_transfer(self):
-        account_number = self.entry_account_number.get()
-        amount_str = self.entry_amount.get()
-        amount = float(amount_str)
-        recipient = None
+            account_number = self.entry_account_number.get()
+            amount_str = self.entry_amount.get()
 
-        if account_number == self.logged_in_user.account_number:
-            self.error_label_transfer.configure(text="You cannot transfer to yourself. Nice try")
-            return
+            # Initial validation for empty input and non-numeric input
+            if not amount_str.strip() or not amount_str.isdigit():
+                self.error_label_transfer.configure(text="Please enter a valid amount.")
+                return
 
-        if not amount_str.strip() or not amount_str.isdigit() or float(amount_str) <= 0:
-            self.error_label_transfer.configure(text="Please enter a valid amount.")
-            return
+            try:
+                amount = float(amount_str)
+                if amount <= 0:
+                    self.error_label_transfer.configure(text="Please enter a valid positive amount.")
+                    return
+            except ValueError:
+                self.error_label_transfer.configure(text="Please enter a valid numeric amount.")
+                return
 
-        if amount > self.logged_in_user.balance:
-            self.error_label_transfer.configure(text="Insufficient funds.")
-            return
+            if account_number == self.logged_in_user.account_number:
+                self.error_label_transfer.configure(text="You cannot transfer to yourself. Nice try")
+                return
 
-        for user in self.users.values():
-            if user.account_number == account_number:
-                recipient = user
-                break
+            # Bank charges for the transfer
+            bank_charges = 10  # Example bank charges for processing the transfer
 
-        if not recipient:
-            self.error_label_transfer.configure(text="Recipient account number not found.")
-            return
+            # Total amount to be deducted (amount + bank charges)
+            total_deduction = amount + bank_charges
 
-        self.logged_in_user.balance -= amount
-        recipient.balance += amount
+            if total_deduction > self.logged_in_user.balance:
+                self.error_label_transfer.configure(text="Insufficient funds.")
+                return
 
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.logged_in_user.transactions.append(
-            f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}")
-        recipient.transactions.append(
-            f"Received R{amount:.2f} from {self.logged_in_user.account_number} on {timestamp}")
+            recipient = None
+            for user in self.users.values():
+                if user.account_number == account_number:
+                    recipient = user
+                    break
 
-        self.save_users()
-        self.save_transaction_log(self.logged_in_user.email,
-                                  f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}")
-        self.save_transaction_log(recipient.email,
-                                  f"Received R{amount:.2f} from {self.logged_in_user.account_number} on {timestamp}")
+            if not recipient:
+                self.error_label_transfer.configure(text="Recipient account number not found.")
+                return
 
-        self.error_label_transfer.configure(text="Transfer successful.", text_color="green")
-        self.create_popup("Transfer Successful",
-                          f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}",
-                          page=self.open_dashboard)
+            # Deduct the total amount from the user's balance (amount + bank charges)
+            self.logged_in_user.balance -= total_deduction
+            # Add the transfer amount to the recipient's balance
+            recipient.balance += amount
+
+            # Record the transaction
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            self.logged_in_user.transactions.append(
+                f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}, Bank Charges: R{bank_charges:.2f}")
+            recipient.transactions.append(
+                f"Received R{amount:.2f} from {self.logged_in_user.account_number} on {timestamp}")
+
+            # Save the updated user data and transaction log
+            self.save_users()
+            self.save_transaction_log(self.logged_in_user.email,
+                                    f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}, Bank Charges: R{bank_charges:.2f}")
+            self.save_transaction_log(recipient.email,
+                                    f"Received R{amount:.2f} from {self.logged_in_user.account_number} on {timestamp}")
+
+            # Update the UI to reflect the successful transfer
+            self.error_label_transfer.configure(text="Transfer successful.", text_color="green")
+            self.create_popup("Transfer Successful",
+                            f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}",
+                            page=self.open_dashboard)
+
 
     def process_loan(self):
         amount_str = self.entry_loan_amount.get()
 
-        if not amount_str.strip() or not amount_str.isdigit() or float(amount_str) <= 0:
+        # Initial validation for empty input and non-numeric input
+        if not amount_str.strip() or not amount_str.isdigit():
             self.error_label_loan.configure(text="Please enter a valid amount.")
             return
 
-        amount = float(amount_str)
+        try:
+            amount = float(amount_str)
+            if amount <= 0:
+                self.error_label_loan.configure(text="Please enter a valid positive amount.")
+                return
+        except ValueError:
+            self.error_label_loan.configure(text="Please enter a valid numeric amount.")
+            return
+
+        # Minimum balance required to apply for a loan
+        minimum_balance_required = 500  # Example minimum balance required
+        if self.logged_in_user.balance < minimum_balance_required:
+            self.error_label_loan.configure(text="Insufficient balance to apply for a loan.")
+            return
+
+        # Bank charges for the loan
+        bank_charges = 50  # Example bank charges for processing the loan
+
+        # Deduct bank charges from the user's balance
+        if self.logged_in_user.balance < bank_charges:
+            self.error_label_loan.configure(text="Insufficient balance to cover bank charges.")
+            return
+        self.logged_in_user.balance -= bank_charges
+
+        # Add the loan amount to the user's balance
         self.logged_in_user.balance += amount
 
+        # Record the transaction
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        transaction_details = f"Loan of R{amount:.2f} received on {timestamp}"
+        transaction_details = f"Loan of R{amount:.2f} received on {timestamp}, Bank Charges: R{bank_charges:.2f}"
 
         self.logged_in_user.transactions.append(f"{self.logged_in_user.email}, {transaction_details}")
 
+        # Save the updated user data and transaction log
         self.save_users()
         self.save_transaction_log(self.logged_in_user.email, transaction_details)
 
+        # Update the UI to reflect the successful loan
         self.error_label_loan.configure(text="Loan approved and credited to your account.", text_color="green")
         self.create_popup("Loan Accepted", f"Loan of R{amount:.2f} received on {timestamp}", page=self.open_dashboard)
 
