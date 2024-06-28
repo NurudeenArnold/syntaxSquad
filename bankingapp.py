@@ -136,23 +136,37 @@ class BankingApplication:
     def process_loan(self):
         amount_str = self.entry_loan_amount.get()
 
-        if not amount_str.strip() or not amount_str.isdigit() or float(amount_str) <= 0:
-            self.error_label_loan.configure(text="Please enter a valid amount.")
-            return
+    # Initial validation for empty input and non-numeric input
+        if not amount_str.strip() or not amount_str.isdigit() or float(amount_str) <= 0: # type: ignore
+          self.error_label_loan.configure(text="Please enter a valid amount.")
+          return
 
-        amount = float(amount_str)
-        self.logged_in_user.balance += amount
+        try:
+            amount = float(amount_str) # type: ignore
+            if amount <= 0:
+                self.error_label_loan.configure(text="Please enter a valid positive amount.")
+                return
+        except ValueError:
+                self.error_label_loan.configure(text="Please enter a valid numeric amount.")
+                return
 
+        # Update the user's balance with the loan amount
+        self.logged_in_user.balance += amount # type: ignore
+
+        # Record the transaction
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         transaction_details = f"Loan of R{amount:.2f} received on {timestamp}"
         
-        self.logged_in_user.transactions.append(f"{self.logged_in_user.email}, {transaction_details}")
+        self.logged_in_user.transactions.append(f"{self.logged_in_user.email}, {transaction_details}") # type: ignore
 
-        self.save_users()
-        self.save_transaction_log(self.logged_in_user.email, transaction_details)
+        # Save the updated user data and transaction log
+        self.save_users() # type: ignore
+        self.save_transaction_log(self.logged_in_user.email, transaction_details) # type: ignore
 
-        self.error_label_loan.configure(text="Loan approved and credited to your account.", text_color="green")
-        self.create_popup("Loan Accepted", f"Loan of R{amount:.2f} received on {timestamp}", page=self.open_dashboard)
+        # Update the UI to reflect the successful loan
+        self.error_label_loan.configure(text="Loan approved and credited to your account.", text_color="green") # type: ignore
+        self.create_popup("Loan Accepted", f"Loan of R{amount:.2f} received on {timestamp}", page=self.open_dashboard) # type: ignore
+
 
     def center_window(self, width, height):
         screen_width = self.root.winfo_screenwidth()
