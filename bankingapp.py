@@ -116,7 +116,6 @@ class BankingApplication:
             account_number = self.entry_account_number.get()
             amount_str = self.entry_amount.get()
 
-            # Initial validation for empty input and non-numeric input
             if not amount_str.strip() or not amount_str.isdigit():
                 self.error_label_transfer.configure(text="Please enter a valid amount.")
                 return
@@ -134,8 +133,7 @@ class BankingApplication:
                 self.error_label_transfer.configure(text="You cannot transfer to yourself. Nice try")
                 return
 
-            # Bank charges for the transfer
-            bank_charges = 10  # Example bank charges for processing the transfer
+            bank_charges = 10  
 
             total_deduction = amount + bank_charges
 
@@ -153,26 +151,21 @@ class BankingApplication:
                 self.error_label_transfer.configure(text="Recipient account number not found.")
                 return
 
-            # Deduct the total amount from the user's balance (amount + bank charges)
             self.logged_in_user.balance -= total_deduction
-            # Add the transfer amount to the recipient's balance
             recipient.balance += amount
 
-            # Record the transaction
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             self.logged_in_user.transactions.append(
                 f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}, Bank Charges: R{bank_charges:.2f}")
             recipient.transactions.append(
                 f"Received R{amount:.2f} from {self.logged_in_user.account_number} on {timestamp}")
 
-            # Save the updated user data and transaction log
             self.save_users()
             self.save_transaction_log(self.logged_in_user.email,
                                     f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}, Bank Charges: R{bank_charges:.2f}")
             self.save_transaction_log(recipient.email,
                                     f"Received R{amount:.2f} from {self.logged_in_user.account_number} on {timestamp}")
 
-            # Update the UI to reflect the successful transfer
             self.error_label_transfer.configure(text="Transfer successful.", text_color="green")
             self.create_popup("Transfer Successful",
                             f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}. \n Bank charges: R{bank_charges:.2f}",
@@ -182,7 +175,6 @@ class BankingApplication:
     def process_loan(self):
         amount_str = self.entry_loan_amount.get()
 
-        # Initial validation for empty input and non-numeric input
         if not amount_str.strip() or not amount_str.isdigit():
             self.error_label_loan.configure(text="Please enter a valid amount.")
             return
@@ -196,35 +188,28 @@ class BankingApplication:
             self.error_label_loan.configure(text="Please enter a valid numeric amount.")
             return
 
-        # Minimum balance required to apply for a loan
-        minimum_balance_required = 500  # Example minimum balance required
+        minimum_balance_required = 500  
         if self.logged_in_user.balance < minimum_balance_required:
             self.error_label_loan.configure(text="Insufficient balance to apply for a loan.")
             return
 
-        # Bank charges for the loan
-        bank_charges = 50  # Example bank charges for processing the loan
+        bank_charges = 50  
 
-        # Deduct bank charges from the user's balance
         if self.logged_in_user.balance < bank_charges:
             self.error_label_loan.configure(text="Insufficient balance to cover bank charges.")
             return
         self.logged_in_user.balance -= bank_charges
 
-        # Add the loan amount to the user's balance
         self.logged_in_user.balance += amount
 
-        # Record the transaction
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         transaction_details = f"Loan of R{amount:.2f} received on {timestamp}, Bank Charges: R{bank_charges:.2f}"
 
         self.logged_in_user.transactions.append(f"{self.logged_in_user.email}, {transaction_details}")
 
-        # Save the updated user data and transaction log
         self.save_users()
         self.save_transaction_log(self.logged_in_user.email, transaction_details)
 
-        # Update the UI to reflect the successful loan
         self.error_label_loan.configure(text="Loan approved and credited to your account.", text_color="green")
         self.create_popup("Loan Accepted", f"Loan of R{amount:.2f} received on {timestamp}", page=self.open_dashboard)
 
@@ -506,14 +491,11 @@ class BankingApplication:
             self.error_label.configure(text="Email address not found.")
             return
 
-        # Generate a new temporary password
         new_password = self.generate_temporary_password()
         user.password = new_password
 
-        # Send email with new password
         self.send_reset_email(email, new_password)
 
-        # Save the updated user data
         self.save_users()
 
         self.error_label.configure(text="A new password has been sent to your email.", text_color="green")
@@ -526,8 +508,8 @@ class BankingApplication:
         return ''.join(random.choice(characters) for i in range(length))
 
     def send_reset_email(self, recipient_email, new_password):
-        sender_email = "sewparsad60@gmail.com"  # Replace with your email
-        sender_password = "xahk ahrn vvyl lgua"  # Replace with your email password
+        sender_email = "sewparsad60@gmail.com"  
+        sender_password = "xahk ahrn vvyl lgua"  
         subject = " NexBank Password Reset"
 
         message = MIMEMultipart()
@@ -539,7 +521,7 @@ class BankingApplication:
         message.attach(MIMEText(body, 'plain'))
 
         try:
-            server = smtplib.SMTP('smtp.gmail.com', 587)  # Replace with your SMTP server and port
+            server = smtplib.SMTP('smtp.gmail.com', 587)  
             server.starttls()
             server.login(sender_email, sender_password)
             text = message.as_string()
@@ -849,16 +831,15 @@ class BankingApplication:
             self.error_label_pdf.configure(text="Cannot download if there are no transactions made yet.")
             return
 
-        # Open a file dialog to choose the save location
         root = tk.Tk()
-        root.withdraw()  # Hide the root window
+        root.withdraw()  
         pdf_filename = filedialog.asksaveasfilename(
             defaultextension=".pdf",
             filetypes=[("PDF files", "*.pdf")],
             initialfile=f"{self.logged_in_user.account_number}_transaction_history.pdf"
         )
         if not pdf_filename:
-            return  # User canceled the save dialog
+            return  
 
         c = canvas.Canvas(pdf_filename, pagesize=letter)
 
@@ -1013,7 +994,6 @@ class BankingApplication:
     def start_download_thread(self):
         download_thread = threading.Thread(target=self.download_transaction_history)
         download_thread.start()
-
 
 if __name__ == "__main__":
     root = customtkinter.CTk()
