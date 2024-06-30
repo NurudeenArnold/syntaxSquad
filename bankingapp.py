@@ -23,7 +23,7 @@ class User:
         self.email = email
         self.password = password
         self.account_number = account_number
-        self.balance = 0.0
+        self.balance = 500.0
         self.transactions = []
         self.ID = ID
         self.contact = contact
@@ -137,7 +137,6 @@ class BankingApplication:
             # Bank charges for the transfer
             bank_charges = 10  # Example bank charges for processing the transfer
 
-            # Total amount to be deducted (amount + bank charges)
             total_deduction = amount + bank_charges
 
             if total_deduction > self.logged_in_user.balance:
@@ -176,7 +175,7 @@ class BankingApplication:
             # Update the UI to reflect the successful transfer
             self.error_label_transfer.configure(text="Transfer successful.", text_color="green")
             self.create_popup("Transfer Successful",
-                            f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}",
+                            f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}. \n Bank charges: R{bank_charges:.2f}",
                             page=self.open_dashboard)
 
 
@@ -994,10 +993,10 @@ class BankingApplication:
         popup.pack(padx=20, pady=20)
 
         label_title = customtkinter.CTkLabel(popup, text=title, font=("Helvetica", 25), text_color="red")
-        label_title.pack(pady=10)
+        label_title.pack(pady=10, padx=30)
 
         label_message = customtkinter.CTkLabel(popup, text=message, font=("Helvetica", 12), text_color=text_color)
-        label_message.pack(pady=10)
+        label_message.pack(pady=10, padx=30)
 
         button_ok = customtkinter.CTkButton(popup, text="OK", command=page, corner_radius=32)
         button_ok.pack(pady=10, padx=100)
