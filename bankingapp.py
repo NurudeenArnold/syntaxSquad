@@ -93,7 +93,7 @@ class BankingApplication:
         with open("UserData.txt", "w") as file:
             for user in self.users.values():
                 file.write(
-                    f"{user.email},{user.password},{user.account_number},{user.balance}, {user.ID},{user.contact},{user.dob}\n")
+                    f"{user.email},{user.password},{user.account_number},{user.balance},{user.ID},{user.contact},{user.dob}\n")
 
     def load_transaction_history(self, email):
         try:
@@ -596,6 +596,14 @@ class BankingApplication:
         dob = self.entry_DOB.get().strip()
         ID = self.entry_ID.get().strip()
         contact = self.entry_contact.get().strip()
+        confirmPassword = self.entry_confirmPassword.get()
+        password = self.entry_password.get()
+        email = self.entry_email.get()
+        email = email.lower()
+
+        if not (dob and ID and contact and email and password and confirmPassword):
+            self.error_label_reg.configure(text="Please fill in all fields")
+            return
 
         if not re.match(r'\d{2}/\d{2}/\d{4}', dob):
             self.error_label_reg.configure(text="Please enter Date of Birth in DD/MM/YYYY format.")
@@ -630,9 +638,6 @@ class BankingApplication:
             self.error_label_reg.configure(text="Please enter a 10-digit South African phone number.")
             return
 
-        email = self.entry_email.get()
-        email = email.lower()
-
         if not email.strip():
             self.error_label_reg.configure(text="Email cannot be empty.")
             return
@@ -658,7 +663,7 @@ class BankingApplication:
                     text="Password is not strong. \nPlease include lowercase, uppercase, digits, and symbols.")
                 return
 
-        if password != self.entry_confirmPassword.get():
+        if password != confirmPassword:
             self.error_label_reg.configure(text="Passwords do not match.")
             return
 
@@ -692,6 +697,10 @@ class BankingApplication:
         email = self.entry_email.get()
         email = email.lower()
         password = self.entry_password.get()
+
+        if not (email and password):
+            self.error_label.configure(text="Please fill in all fields")
+            return
 
         if email in self.users and self.users[email].password == password:
             self.logged_in_user = self.users[email]
