@@ -59,3 +59,6 @@ nurudeenarnold@gmail.com,Transferred R10.00 to 3096846260 on 2024-06-30 20:57:56
 test@testing.com,Received R10.00 from 2836481173 on 2024-06-30 20:57:56
 nurudeenarnold@gmail.com,Transferred R160.00 to 3096846260 on 2024-06-30 20:58:19, Bank Charges: R10.00
 test@testing.com,Received R160.00 from 2836481173 on 2024-06-30 20:58:19
+nurudeenarnold@gmail.com,Loan of R1000.00 received on 2024-06-30 21:39:04, Bank Charges: R50.00
+nurudeenarnold@gmail.com,Transferred R440.00 to 2486453130 on 2024-06-30 21:39:36, Bank Charges: R10.00
+nurudeenarnold1@gmail.com,Received R440.00 from 1822141656 on 2024-06-30 21:39:36

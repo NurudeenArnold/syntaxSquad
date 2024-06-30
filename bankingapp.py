@@ -25,8 +25,8 @@ class User:
         self.account_number = account_number
         self.balance = 500.0
         self.transactions = []
-        self.ID = ID
         self.contact = contact
+        self.ID = ID
         self.dob = dob
 
 
@@ -79,12 +79,12 @@ class BankingApplication:
                 for line in file:
                     data = line.strip().split(",")
                     if len(data) == 7:
-                        email, password, account_number, balance, ID, contact, dob = data
-                        self.users[email] = User(email, password, account_number, ID, contact, dob, )
+                        email, password, account_number, contact, ID, dob, balance = data
+                        self.users[email] = User(email, password, account_number, contact, ID, dob)
                         self.users[email].balance = float(balance)
                     elif len(data) == 6:
-                        email, password, account_number, ID, contact, dob = data
-                        self.users[email] = User(email, password, account_number, ID, contact, dob)
+                        email, password, account_number, contact, ID, dob = data
+                        self.users[email] = User(email, password, account_number, contact, ID, dob)
                     self.load_transaction_history(email)
         except FileNotFoundError:
             pass
@@ -93,7 +93,7 @@ class BankingApplication:
         with open("UserData.txt", "w") as file:
             for user in self.users.values():
                 file.write(
-                    f"{user.email},{user.password},{user.account_number},{user.balance},{user.ID},{user.contact},{user.dob}\n")
+                    f"{user.email},{user.password},{user.account_number},{user.contact},{user.ID},{user.dob},{user.balance}\n")
 
     def load_transaction_history(self, email):
         try:
@@ -211,7 +211,7 @@ class BankingApplication:
         self.save_transaction_log(self.logged_in_user.email, transaction_details)
 
         self.error_label_loan.configure(text="Loan approved and credited to your account.", text_color="green")
-        self.create_popup("Loan Accepted", f"Loan of R{amount:.2f} received on {timestamp}", page=self.open_dashboard)
+        self.create_popup("Loan Accepted", f"Loan of R{amount:.2f} received on {timestamp}.\nBank Charges: R{bank_charges:.2f}", page=self.open_dashboard)
 
     def center_window(self, width, height):
         screen_width = self.root.winfo_screenwidth()
@@ -623,13 +623,13 @@ class BankingApplication:
             self.error_label_reg.configure(text="Email cannot be empty.")
             return
 
-        if email in self.users:
-            self.error_label_reg.configure(text="Email already registered. Please try a different email.")
-            return
-
-        if ID in self.users:
-            self.error_label_reg.configure(text="There is already an account with this ID Number.")
-            return
+        for user in self.users.values():
+            if user.ID == ID:
+                self.error_label_reg.configure(text="There is already an account with this ID Number.")
+                return
+            if user.email == email:
+                self.error_label_reg.configure(text="Email already registered. Please try a different email.")
+                return
 
         if not re.match(email_pattern, email):
             self.error_label_reg.configure(text="Invalid email format.")
@@ -847,11 +847,11 @@ class BankingApplication:
         c.drawImage(logo_path, 50, 650, width=100, height=100)
 
         c.setFont("Helvetica", 12)
-        c.drawString(350, 710, "ID Number: " + self.logged_in_user.ID)
-        c.drawString(350, 695, "Contact Number: " + self.logged_in_user.contact)
-        c.drawString(350, 680, "DOB (DD/MM/YYYY): " + self.logged_in_user.dob)
-        c.drawString(350, 665, "Account Number: " + self.logged_in_user.account_number)
-        c.drawString(350, 650, "Email: " + self.logged_in_user.email)
+        c.drawString(350, 730, "ID Number: " + self.logged_in_user.ID)
+        c.drawString(350, 715, "Contact Number: " + self.logged_in_user.contact)
+        c.drawString(350, 700, "DOB (DD/MM/YYYY): " + self.logged_in_user.dob)
+        c.drawString(350, 685, "Account Number: " + self.logged_in_user.account_number)
+        c.drawString(350, 670, "Email: " + self.logged_in_user.email)
 
         c.setFont("Helvetica-Bold", 16)
         c.drawString(50, 600, "Transaction History")
@@ -940,7 +940,7 @@ class BankingApplication:
         details_frame = customtkinter.CTkFrame(self.root)
         details_frame.pack(padx=10, pady=10)
 
-        label_email = customtkinter.CTkLabel(details_frame, text=f"ID Number: {self.logged_in_user.ID}")
+        label_email = customtkinter.CTkLabel(details_frame, text=f"Email: {self.logged_in_user.email}")
         label_email.pack()
 
         label_account_number = customtkinter.CTkLabel(details_frame,
@@ -950,10 +950,10 @@ class BankingApplication:
         label_email = customtkinter.CTkLabel(details_frame, text=f"Contact Number: {self.logged_in_user.contact}")
         label_email.pack()
 
-        label_email = customtkinter.CTkLabel(details_frame, text=f"Date of Birth: {self.logged_in_user.dob}")
+        label_email = customtkinter.CTkLabel(details_frame, text=f"ID Number: {self.logged_in_user.ID}")
         label_email.pack()
 
-        label_email = customtkinter.CTkLabel(details_frame, text=f"Email: {self.logged_in_user.email}")
+        label_email = customtkinter.CTkLabel(details_frame, text=f"Date of Birth: {self.logged_in_user.dob}")
         label_email.pack()
 
         label_balance = customtkinter.CTkLabel(details_frame, text=f"Balance: R{self.logged_in_user.balance:.2f}")
