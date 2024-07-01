@@ -392,7 +392,7 @@ class BankingApplication:
         self.error_label_reg = customtkinter.CTkLabel(registration_frame, text="", text_color="red")
         self.error_label_reg.pack(padx=10)
 
-        self.button_register = customtkinter.CTkButton(registration_frame, text="Register", command=self.register_user, corner_radius=32)
+        self.button_register = customtkinter.CTkButton(registration_frame, text="Register", command=self.start_register_thread, corner_radius=32)
         self.button_register.pack(pady=(5, 30), padx=100)
 
         self.button_back = customtkinter.CTkButton(registration_frame, text="Back", command=self.create_main_window, corner_radius=32)
@@ -471,7 +471,7 @@ class BankingApplication:
         self.button_login = customtkinter.CTkButton(login_frame, text="Login", command=self.login_user, corner_radius=32)
         self.button_login.pack(pady=(5, 30), padx=100)
 
-        self.button_forgot_password = customtkinter.CTkButton(login_frame, text="Forgot Password", command=self.forgot_password, corner_radius=32)
+        self.button_forgot_password = customtkinter.CTkButton(login_frame, text="Forgot Password", command=self.start_forgot_thread, corner_radius=32)
         self.button_forgot_password.pack(pady=(5, 30), padx=100)
 
         self.button_back = customtkinter.CTkButton(login_frame, text="Back", command=self.create_main_window, corner_radius=32)
@@ -479,26 +479,35 @@ class BankingApplication:
 
         self.center_window(450, 550)
         
+    def handle_forgot_password_error(self, message):
+        self.error_label.configure(text=message)
+        self.reset_forgot_password_button()
+        self.enable_window()
+
+    def reset_forgot_password_button(self):
+        self.root.after(0, lambda: self.button_forgot_password.configure(text="Forgot Password"))
+
     def forgot_password(self):
         email = self.entry_email.get().strip()
 
         if not email:
-            self.error_label.configure(text="Please enter your email address.")
+            self.handle_forgot_password_error("Please enter your email address.")
             return
 
         user = self.users.get(email)
         if not user:
-            self.error_label.configure(text="Email address not found.")
+            self.handle_forgot_password_error("Email address not found.")
             return
 
         new_password = self.generate_temporary_password()
         user.password = new_password
 
         self.send_reset_email(email, new_password)
-
         self.save_users()
 
         self.error_label.configure(text="A new password has been sent to your email.", text_color="green")
+        self.reset_forgot_password_button()
+        self.enable_window()
 
     def generate_temporary_password(self, length=8):
         import random
@@ -572,6 +581,14 @@ class BankingApplication:
         has_special = any(c in string.punctuation for c in password)
         return len(password) >= 8 and has_lower and has_upper and has_digit and has_special
 
+    def handle_error(self, message):
+        self.error_label_reg.configure(text=message)
+        self.reset_register_button()
+        self.enable_window()
+
+    def reset_register_button(self):
+        self.root.after(0, lambda: self.button_register.configure(text="Register"))
+
     def register_user(self):
         email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         dob = self.entry_DOB.get().strip()
@@ -583,56 +600,56 @@ class BankingApplication:
         email = email.lower()
 
         if not (dob and ID and contact and email and password and confirmPassword):
-            self.error_label_reg.configure(text="Please fill in all fields")
+            self.handle_error("Please fill in all fields")
             return
 
         if not re.match(r'\d{2}/\d{2}/\d{4}', dob):
-            self.error_label_reg.configure(text="Please enter Date of Birth in DD/MM/YYYY format.")
+            self.handle_error("Please enter Date of Birth in DD/MM/YYYY format.")
             return
 
         try:
             dob_date = datetime.strptime(dob, '%d/%m/%Y')
         except ValueError:
-            self.error_label_reg.configure(text="Invalid Date of Birth.")
+            self.handle_error("Invalid Date of Birth.")
             return
 
         today = datetime.today()
         age = today.year - dob_date.year - ((today.month, today.day) < (dob_date.month, dob_date.day))
 
         if age < 18:
-            self.error_label_reg.configure(text="You must be older than 18 years to register.")
+            self.handle_error("You must be older than 18 years to register.")
             return
 
         if not ID.isdigit():
-            self.error_label_reg.configure(text="Please enter a valid ID Number")
+            self.handle_error("Please enter a valid ID Number")
             return
 
         if len(ID) != 13:
-            self.error_label_reg.configure(text="Please enter a 13-digit ID Number")
+            self.handle_error("Please enter a 13-digit ID Number")
             return
 
         if not contact.isdigit():
-            self.error_label_reg.configure(text="Please enter a valid South African phone number")
+            self.handle_error("Please enter a valid South African phone number")
             return
 
         if len(contact) != 10:
-            self.error_label_reg.configure(text="Please enter a 10-digit South African phone number.")
+            self.handle_error("Please enter a 10-digit South African phone number.")
             return
 
         if not email.strip():
-            self.error_label_reg.configure(text="Email cannot be empty.")
+            self.handle_error("Email cannot be empty.")
             return
 
         for user in self.users.values():
             if user.ID == ID:
-                self.error_label_reg.configure(text="There is already an account with this ID Number.")
+                self.handle_error("There is already an account with this ID Number.")
                 return
             if user.email == email:
-                self.error_label_reg.configure(text="Email already registered. Please try a different email.")
+                self.handle_error("Email already registered. Please try a different email.")
                 return
 
         if not re.match(email_pattern, email):
-            self.error_label_reg.configure(text="Invalid email format.")
+            self.handle_error("Invalid email format.")
             return
 
         if self.var_generate_password.get():
@@ -640,12 +657,11 @@ class BankingApplication:
         else:
             password = self.entry_password.get()
             if not self.is_strong_password(password):
-                self.error_label_reg.configure(
-                    text="Password is not strong. \nPlease include lowercase, uppercase, digits, and symbols.")
+                self.handle_error("Password is not strong. \nPlease include lowercase, uppercase, digits, and symbols.")
                 return
 
         if password != confirmPassword:
-            self.error_label_reg.configure(text="Passwords do not match.")
+            self.handle_error("Passwords do not match.")
             return
 
         account_number = self.generate_account_number()
@@ -994,6 +1010,47 @@ class BankingApplication:
     def start_download_thread(self):
         download_thread = threading.Thread(target=self.download_transaction_history)
         download_thread.start()
+
+    def start_register_thread(self):
+        self.button_register.configure(text="Registering...\nPlease Wait")
+        self.disable_window()
+        register_thread = threading.Thread(target=self.register_user)
+        register_thread.start() 
+
+    def start_forgot_thread(self):
+        self.button_forgot_password.configure(text="Please Wait...")
+        self.disable_window()
+        forgot_thread = threading.Thread(target=self.forgot_password)
+        forgot_thread.start()
+
+    def enable_window(self):
+        for widget in self.root.winfo_children():
+            if isinstance(widget, (customtkinter.CTkButton, customtkinter.CTkEntry, customtkinter.CTkCheckBox)):
+                self.enable_widget(widget)
+            for child in widget.winfo_children():
+                if isinstance(child, (customtkinter.CTkButton, customtkinter.CTkEntry, customtkinter.CTkCheckBox)):
+                    self.enable_widget(child)
+
+    def enable_widget(self, widget):
+        try:
+            widget.configure(state='normal')
+        except tk.TclError:
+            pass
+
+    def disable_widget(self, widget):
+        try:
+            widget.configure(state='disabled')
+        except tk.TclError:
+            pass
+
+    def disable_window(self):
+        print("window disabled")
+        for widget in self.root.winfo_children():
+            if isinstance(widget, (customtkinter.CTkButton, customtkinter.CTkEntry, customtkinter.CTkCheckBox)):
+                self.disable_widget(widget)
+            for child in widget.winfo_children():
+                if isinstance(child, (customtkinter.CTkButton, customtkinter.CTkEntry, customtkinter.CTkCheckBox)):
+                    self.disable_widget(child)   
 
 if __name__ == "__main__":
     root = customtkinter.CTk()
