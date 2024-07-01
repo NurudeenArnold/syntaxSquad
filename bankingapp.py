@@ -23,7 +23,7 @@ class User:
         self.email = email
         self.password = password
         self.account_number = account_number
-        self.balance = 150.0
+        self.balance = 500.0
         self.transactions = []
         self.contact = contact
         self.ID = ID
