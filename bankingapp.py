@@ -1,3 +1,5 @@
+import os
+import tempfile
 import tkinter as tk
 import customtkinter
 from tkinter import Canvas, Frame, messagebox, PhotoImage
@@ -14,6 +16,8 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 import threading
+from email.mime.application import MIMEApplication
+from email.utils import formataddr
 
 customtkinter.set_appearance_mode("Light")
 customtkinter.set_default_color_theme("themes/red.json")
@@ -834,6 +838,10 @@ class BankingApplication:
                                                        command=self.start_download_thread, corner_radius=32)
         self.button_download.pack(pady=10, padx=(30, 0))
 
+        self.button_email = customtkinter.CTkButton(frame, text="Email Statement",
+                                                       command=self.start_emailPDF_thread, corner_radius=32)
+        self.button_email.pack(pady=10, padx=(30, 0))
+
         button_back = customtkinter.CTkButton(frame, text="Back", command=self.open_dashboard, corner_radius=32)
         button_back.pack(pady=10, padx=(30, 0))
 
@@ -1012,7 +1020,7 @@ class BankingApplication:
         download_thread.start()
 
     def start_register_thread(self):
-        self.button_register.configure(text="Registering...\nPlease Wait")
+        self.button_register.configure(text="Registering\nPlease Wait...")
         self.disable_window()
         register_thread = threading.Thread(target=self.register_user)
         register_thread.start() 
@@ -1021,6 +1029,12 @@ class BankingApplication:
         self.button_forgot_password.configure(text="Please Wait...")
         self.disable_window()
         forgot_thread = threading.Thread(target=self.forgot_password)
+        forgot_thread.start()
+
+    def start_emailPDF_thread(self):
+        self.button_email.configure(text="Sending\nPlease Wait...")
+        self.disable_window()
+        forgot_thread = threading.Thread(target=self.send_pdf_via_email)
         forgot_thread.start()
 
     def enable_window(self):
@@ -1050,7 +1064,96 @@ class BankingApplication:
                 self.disable_widget(widget)
             for child in widget.winfo_children():
                 if isinstance(child, (customtkinter.CTkButton, customtkinter.CTkEntry, customtkinter.CTkCheckBox)):
-                    self.disable_widget(child)   
+                    self.disable_widget(child)  
+
+    def send_pdf_via_email(self):
+        if not self.logged_in_user.transactions:
+            self.error_label_pdf.configure(text="Cannot send email if there are no transactions made yet.")
+            return
+
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+        pdf_filename = temp_file.name
+        temp_file.close()
+
+        c = canvas.Canvas(pdf_filename, pagesize=letter)
+
+        logo_path = "nexbank.png"
+        c.drawImage(logo_path, 50, 650, width=100, height=100)
+
+        c.setFont("Helvetica", 12)
+        c.drawString(350, 730, "ID Number: " + self.logged_in_user.ID)
+        c.drawString(350, 715, "Contact Number: " + self.logged_in_user.contact)
+        c.drawString(350, 700, "DOB (DD/MM/YYYY): " + self.logged_in_user.dob)
+        c.drawString(350, 685, "Account Number: " + self.logged_in_user.account_number)
+        c.drawString(350, 670, "Email: " + self.logged_in_user.email)
+
+        c.setFont("Helvetica-Bold", 16)
+        c.drawString(50, 600, "Transaction History")
+
+        c.setFont("Helvetica", 12)
+        c.drawString(50, 570, "-" * 70)
+
+        y_position = 555
+        max_y = 50
+
+        for transaction in self.logged_in_user.transactions:
+            transaction_parts = transaction.split(" on ")
+            if len(transaction_parts) >= 2:
+                transaction_info = transaction_parts[0].strip()
+                timestamp = transaction_parts[1].strip()
+
+                c.drawString(50, y_position, f"Transaction: {transaction_info}")
+                c.drawString(50, y_position - 15, f"Timestamp: {timestamp}")
+                c.drawString(50, y_position - 30, "-" * 70)
+                y_position -= 45
+
+                if y_position < max_y:
+                    c.showPage()
+                    c.drawImage(logo_path, 50, 650, width=100, height=100)
+                    c.setFont("Helvetica-Bold", 16)
+                    c.drawString(50, 600, "Continued Transaction History")
+                    c.setFont("Helvetica", 12)
+                    c.drawString(50, 570, "-" * 70)
+                    y_position = 555
+
+            else:
+                print(f"Issue with transaction format: {transaction}")
+
+        c.save()
+        print(f"Transaction history saved to {pdf_filename}")
+
+        recipient_email = self.logged_in_user.email
+        subject = "Your Transaction History"
+        body = "Dear Customer,\n\nPlease find attached your transaction history.\n\nBest regards,\nNexBank Team"
+
+        sender_email = "sewparsad60@gmail.com"  
+        sender_password = "xahk ahrn vvyl lgua"
+
+        message = MIMEMultipart()
+        message['From'] = formataddr(('Nex Bank', sender_email))
+        message['To'] = recipient_email
+        message['Subject'] = subject
+
+        message.attach(MIMEText(body, 'plain'))
+
+        with open(pdf_filename, 'rb') as attachment:
+            part = MIMEApplication(attachment.read(), Name=os.path.basename(pdf_filename))
+        part['Content-Disposition'] = f'attachment; filename="{os.path.basename(pdf_filename)}"'
+        message.attach(part)
+
+        try:
+            with smtplib.SMTP('smtp.gmail.com', 587) as server:
+                server.starttls()
+                server.login(sender_email, sender_password)
+                server.sendmail(sender_email, recipient_email, message.as_string())
+            print(f"Email sent to {recipient_email} with attachment {pdf_filename}.")
+            self.error_label_pdf.configure(text="Email sent with transaction history.", text_color="green")
+            self.button_email.configure(text="Email PDF Statement")
+        except Exception as e:
+            print(f"Failed to send email: {e}")
+            self.error_label_pdf.configure(text="Failed to send email.", text_color="red")
+            self.button_email.configure(text="Email PDF Statement")
+        os.remove(pdf_filename)
 
 if __name__ == "__main__":
     root = customtkinter.CTk()
