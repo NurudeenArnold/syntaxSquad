@@ -1,0 +1,66 @@
+nurudeenarnold@gmail.com,Loan of R1000.00 received on 2024-06-20 20:58:12
+nurudeenarnold@gmail.com,Loan of R150.00 received on 2024-06-20 21:23:41
+nurudeenarnold@gmail.com,Transferred R150.00 to 6194500825 on 2024-06-20 21:25:54
+testing@gmail.com,Received R150.00 from 9451887284 on 2024-06-20 21:25:54
+nurudeenarnold@gmail.com,Transferred R5.00 to 6194500825 on 2024-06-20 21:26:46
+testing@gmail.com,Received R5.00 from 9451887284 on 2024-06-20 21:26:46
+nurudeenarnold@gmail.com,Transferred R5.00 to 6194500825 on 2024-06-20 21:28:19
+testing@gmail.com,Received R5.00 from 9451887284 on 2024-06-20 21:28:19
+nurudeenarnold@gmail.com,Transferred R5.00 to 6194500825 on 2024-06-20 21:29:03
+testing@gmail.com,Received R5.00 from 9451887284 on 2024-06-20 21:29:03
+nurudeenarnold@gmail.com,Transferred R5.00 to 6194500825 on 2024-06-20 21:29:28
+testing@gmail.com,Received R5.00 from 9451887284 on 2024-06-20 21:29:28
+nurudeenarnold@gmail.com,Transferred R5.00 to 6194500825 on 2024-06-20 21:32:30
+testing@gmail.com,Received R5.00 from 9451887284 on 2024-06-20 21:32:30
+nurudeenarnold@gmail.com,Transferred R5.00 to 6194500825 on 2024-06-20 21:33:51
+testing@gmail.com,Received R5.00 from 9451887284 on 2024-06-20 21:33:51
+nurudeenarnold@gmail.com,Transferred R5.00 to 6194500825 on 2024-06-20 21:34:29
+testing@gmail.com,Received R5.00 from 9451887284 on 2024-06-20 21:34:29
+nurudeenarnold@gmail.com,Transferred R5.00 to 6194500825 on 2024-06-20 21:35:49
+testing@gmail.com,Received R5.00 from 9451887284 on 2024-06-20 21:35:49
+nurudeenarnold@gmail.com,Transferred R60.00 to 6194500825 on 2024-06-20 21:35:57
+testing@gmail.com,Received R60.00 from 9451887284 on 2024-06-20 21:35:57
+nurudeenarnold@gmail.com,Loan of R12.00 received on 2024-06-20 21:42:13
+nurudeenarnold@gmail.com,Loan of R100.00 received on 2024-06-20 21:42:44
+nurudeenarnold@gmail.com,Loan of R1.00 received on 2024-06-20 22:03:48
+nurudeenarnold@gmail.com,Loan of R1.00 received on 2024-06-20 22:03:50
+nurudeenarnold@gmail.com,Loan of R1.00 received on 2024-06-20 22:03:52
+nurudeenarnold@gmail.com,Loan of R1.00 received on 2024-06-20 22:03:54
+nurudeenarnold@gmail.com,Loan of R12.00 received on 2024-06-20 23:29:44
+nurudeenarnold@gmail.com,Loan of R500.00 received on 2024-06-28 09:54:19
+ammaarahfakier01@gmail.com,Loan of R2500000.00 received on 2024-06-28 13:16:05
+ammaarahfakier01@gmail.com,Transferred R250000.00 to 8825809069 on 2024-06-28 13:32:03
+nurudeenarnold@gmail.com,Received R250000.00 from 9862964949 on 2024-06-28 13:32:03
+ammaarahfakier01@gmail.com,Transferred R2225000.00 to 8825809069 on 2024-06-28 13:32:42
+nurudeenarnold@gmail.com,Received R2225000.00 from 9862964949 on 2024-06-28 13:32:42
+ammaarahfakier01@gmail.com,Transferred R2500.00 to 8825809069 on 2024-06-28 13:33:07
+nurudeenarnold@gmail.com,Received R2500.00 from 9862964949 on 2024-06-28 13:33:07
+ammaarahfakier01@gmail.com,Transferred R2400.00 to 8825809069 on 2024-06-28 13:33:28
+nurudeenarnold@gmail.com,Received R2400.00 from 9862964949 on 2024-06-28 13:33:28
+ammaarahfakier01@gmail.com,Transferred R2020.00 to 8825809069 on 2024-06-28 13:34:00
+nurudeenarnold@gmail.com,Received R2020.00 from 9862964949 on 2024-06-28 13:34:00
+ammaarahfakier01@gmail.com,Transferred R17000.00 to 8825809069 on 2024-06-28 13:34:14
+nurudeenarnold@gmail.com,Received R17000.00 from 9862964949 on 2024-06-28 13:34:14
+ammaarahfakier01@gmail.com,Transferred R900.00 to 8825809069 on 2024-06-28 13:34:25
+nurudeenarnold@gmail.com,Received R900.00 from 9862964949 on 2024-06-28 13:34:25
+ammaarahfakier01@gmail.com,Transferred R80.00 to 8825809069 on 2024-06-28 13:39:40, Bank Charges: R10.00
+nurudeenarnold@gmail.com,Received R80.00 from 9862964949 on 2024-06-28 13:39:40
+nurudeenarnold@gmail.com,Transferred R10000.00 to 9862964949 on 2024-06-28 13:41:37, Bank Charges: R10.00
+ammaarahfakier01@gmail.com,Received R10000.00 from 8825809069 on 2024-06-28 13:41:37
+nurudeenarnold@gmail.com,Loan of R500.00 received on 2024-06-28 13:41:50, Bank Charges: R50.00
+nurudeenarnold@gmail.com,Loan of R100.00 received on 2024-06-28 13:46:08, Bank Charges: R50.00
+nurudeenarnold@gmail.com,Transferred R100.00 to 3096846260 on 2024-06-30 20:54:05, Bank Charges: R10.00
+test@testing.com,Received R100.00 from 2836481173 on 2024-06-30 20:54:05
+nurudeenarnold@gmail.com,Transferred R90.00 to 3096846260 on 2024-06-30 20:56:06, Bank Charges: R10.00
+test@testing.com,Received R90.00 from 2836481173 on 2024-06-30 20:56:06
+nurudeenarnold@gmail.com,Transferred R90.00 to 3096846260 on 2024-06-30 20:57:07, Bank Charges: R10.00
+test@testing.com,Received R90.00 from 2836481173 on 2024-06-30 20:57:07
+nurudeenarnold@gmail.com,Transferred R10.00 to 3096846260 on 2024-06-30 20:57:56, Bank Charges: R10.00
+test@testing.com,Received R10.00 from 2836481173 on 2024-06-30 20:57:56
+nurudeenarnold@gmail.com,Transferred R160.00 to 3096846260 on 2024-06-30 20:58:19, Bank Charges: R10.00
+test@testing.com,Received R160.00 from 2836481173 on 2024-06-30 20:58:19
+nurudeenarnold@gmail.com,Loan of R1000.00 received on 2024-06-30 21:39:04, Bank Charges: R50.00
+nurudeenarnold@gmail.com,Transferred R440.00 to 2486453130 on 2024-06-30 21:39:36, Bank Charges: R10.00
+nurudeenarnold1@gmail.com,Received R440.00 from 1822141656 on 2024-06-30 21:39:36
+nurudeenarnold7@gmail.com,Transferred R200.00 to 9939758861 on 2024-07-02 10:45:23, Bank Charges: R10.00
+nurudeenarnold6@gmail.com,Received R200.00 from 5576725016 on 2024-07-02 10:45:23

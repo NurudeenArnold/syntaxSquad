@@ -47,39 +47,39 @@ class NexBank:
         self.root.resizable(False, False)
         self.create_main_window()
 
-        self.show_path = "icons/eye.png"
+        self.show_path = "eye.png"
         self.show = Image.open(self.show_path)
         self.show = self.show.resize((20, 20), Image.LANCZOS)
         self.imgShow = ImageTk.PhotoImage(self.show)
 
-        self.hide_path = "icons/eyeslash.png"
+        self.hide_path = "eyeslash.png"
         self.hide = Image.open(self.hide_path)
         self.hide = self.hide.resize((20, 20), Image.LANCZOS)
         self.imgHide = ImageTk.PhotoImage(self.hide)
 
-        self.user_path = "icons/user.png"
+        self.user_path = "user.png"
         self.user = Image.open(self.user_path)
         self.user = self.user.resize((20, 20), Image.LANCZOS)
         self.imgUser = ImageTk.PhotoImage(self.user)
 
-        self.phone_path = "icons/phone.png"
+        self.phone_path = "phone.png"
         self.phone = Image.open(self.phone_path)
         self.phone = self.phone.resize((20, 20), Image.LANCZOS)
         self.imgPhone = ImageTk.PhotoImage(self.phone)
 
-        self.email_path = "icons/email.png"
+        self.email_path = "email.png"
         self.email = Image.open(self.email_path)
         self.email = self.email.resize((20, 20), Image.LANCZOS)
         self.imgEmail = ImageTk.PhotoImage(self.email)
 
-        self.password_path = "icons/password.png"
+        self.password_path = "password.png"
         self.password = Image.open(self.password_path)
         self.password = self.password.resize((20, 20), Image.LANCZOS)
         self.imgPassword = ImageTk.PhotoImage(self.password)
 
     def load_users(self):
         try:
-            with open("data/UserData.txt", "r") as file:
+            with open("UserData.txt", "r") as file:
                 for line in file:
                     data = line.strip().split(",")
                     if len(data) == 7:
@@ -94,14 +94,14 @@ class NexBank:
             pass
 
     def save_users(self):
-        with open("data/UserData.txt", "w") as file:
+        with open("UserData.txt", "w") as file:
             for user in self.users.values():
                 file.write(
                     f"{user.email},{user.password},{user.account_number},{user.contact},{user.ID},{user.dob},{user.balance}\n")
 
     def load_transaction_history(self, email):
         try:
-            with open("data/Transactionlog.txt", "r") as file:
+            with open("Transactionlog.txt", "r") as file:
                 self.users[email].transactions.clear()
                 for line in file:
                     transaction_data = line.strip().split(",")
@@ -113,7 +113,7 @@ class NexBank:
             pass
 
     def save_transaction_log(self, email, transaction_details):
-        with open("data/Transactionlog.txt", "a") as file:
+        with open("Transactionlog.txt", "a") as file:
             file.write(f"{email},{transaction_details}\n")
 
     def process_transfer(self):
@@ -231,7 +231,7 @@ class NexBank:
                                                  text_color="#B22E2E")
         self.label_main.pack(pady=20)
 
-        image = PhotoImage(file="images/nexbank2.png")
+        image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(1, 1)
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage
@@ -711,7 +711,7 @@ class NexBank:
 
     def open_dashboard(self):
         self.clear_current_frame()
-        image = PhotoImage(file="images/nexbank2.png")
+        image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(2, 2)
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage
@@ -745,7 +745,7 @@ class NexBank:
     def view_balance(self):
         self.clear_current_frame()
 
-        image = PhotoImage(file="images/nexbank2.png")
+        image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(2, 2)
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage
@@ -763,7 +763,7 @@ class NexBank:
     def transfer_money(self):
         self.clear_current_frame()
 
-        image = PhotoImage(file="images/nexbank2.png")
+        image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(2, 2)
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage
@@ -802,7 +802,7 @@ class NexBank:
         self.clear_current_frame()
         self.load_transaction_history(self.logged_in_user.email)
 
-        image = PhotoImage(file="images/nexbank2.png")
+        image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(2, 2)
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage
@@ -867,7 +867,7 @@ class NexBank:
 
         c = canvas.Canvas(pdf_filename, pagesize=letter)
 
-        logo_path = "images/nexbank.png"
+        logo_path = "nexbank.png"
         c.drawImage(logo_path, 50, 650, width=100, height=100)
 
         c.setFont("Helvetica", 12)
@@ -899,7 +899,7 @@ class NexBank:
 
                 if y_position < max_y:
                     c.showPage()
-                    logo_path = "images/nexbank.png"
+                    logo_path = "nexbank.png"
                     c.drawImage(logo_path, 50, 650, width=100, height=100)
                     c.setFont("Helvetica-Bold", 16)
                     c.drawString(50, 600, "Continued Transaction History")
@@ -916,7 +916,7 @@ class NexBank:
     def take_loan(self):
         self.clear_current_frame()
 
-        image = PhotoImage(file="images/nexbank2.png")
+        image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(2, 2)
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage
@@ -951,7 +951,7 @@ class NexBank:
     def view_personal_details(self):
         self.clear_current_frame()
 
-        image = PhotoImage(file="images/nexbank2.png")
+        image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(2, 2)
         self.image_label = customtkinter.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage
@@ -1069,7 +1069,7 @@ class NexBank:
     def send_pdf_via_email(self):
         if not self.logged_in_user.transactions:
             self.error_label_pdf.configure(text="Cannot send email if there are no transactions made yet.")
-            self.button_email.configure(text="Email PDF Statement")
+            self.button_email.configure(text="Email Statement")
             return
 
         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
@@ -1078,7 +1078,7 @@ class NexBank:
 
         c = canvas.Canvas(pdf_filename, pagesize=letter)
 
-        logo_path = "images/nexbank.png"
+        logo_path = "nexbank.png"
         c.drawImage(logo_path, 50, 650, width=100, height=100)
 
         c.setFont("Helvetica", 12)
@@ -1149,15 +1149,15 @@ class NexBank:
                 server.sendmail(sender_email, recipient_email, message.as_string())
             print(f"Email sent to {recipient_email} with attachment {pdf_filename}.")
             self.error_label_pdf.configure(text="Email sent with transaction history.", text_color="green")
-            self.button_email.configure(text="Email PDF Statement")
+            self.button_email.configure(text="Email Statement")
         except Exception as e:
             print(f"Failed to send email: {e}")
             self.error_label_pdf.configure(text="Failed to send email.", text_color="red")
-            self.button_email.configure(text="Email PDF Statement")
+            self.button_email.configure(text="Email Statement")
         os.remove(pdf_filename)
 
 if __name__ == "__main__":
     root = customtkinter.CTk()
-    root.iconbitmap("icons/nexbank.ico")
+    root.iconbitmap("icon.ico")
     app = NexBank(root)
     root.mainloop()
