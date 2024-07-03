@@ -23,14 +23,13 @@ customtkinter.set_appearance_mode("Light")
 customtkinter.set_default_color_theme("themes/red.json")
 
 class User:
-    def __init__(self, email, password, account_number, contact, ID, dob):
+    def __init__(self, email, password, account_number, contact, dob):
         self.email = email
         self.password = password
         self.account_number = account_number
         self.balance = 500.0
         self.transactions = []
         self.contact = contact
-        self.ID = ID
         self.dob = dob
 
 
@@ -82,13 +81,13 @@ class NexBank:
             with open("UserData.txt", "r") as file:
                 for line in file:
                     data = line.strip().split(",")
-                    if len(data) == 7:
-                        email, password, account_number, contact, ID, dob, balance = data
-                        self.users[email] = User(email, password, account_number, contact, ID, dob)
+                    if len(data) == 6:
+                        email, password, account_number, contact, dob, balance = data
+                        self.users[email] = User(email, password, account_number, contact, dob)
                         self.users[email].balance = float(balance)
-                    elif len(data) == 6:
-                        email, password, account_number, contact, ID, dob = data
-                        self.users[email] = User(email, password, account_number, contact, ID, dob)
+                    elif len(data) == 5:
+                        email, password, account_number, contact, dob = data
+                        self.users[email] = User(email, password, account_number, contact, dob)
                     self.load_transaction_history(email)
         except FileNotFoundError:
             pass
@@ -97,7 +96,7 @@ class NexBank:
         with open("UserData.txt", "w") as file:
             for user in self.users.values():
                 file.write(
-                    f"{user.email},{user.password},{user.account_number},{user.contact},{user.ID},{user.dob},{user.balance}\n")
+                    f"{user.email},{user.password},{user.account_number},{user.contact},{user.dob},{user.balance}\n")
 
     def load_transaction_history(self, email):
         try:
@@ -284,21 +283,6 @@ class NexBank:
 
         registration_frame = customtkinter.CTkFrame(self.root)
         registration_frame.pack(padx=10, pady=10)
-
-        self.label_ID = customtkinter.CTkLabel(registration_frame, text="ID Number:")
-        self.label_ID.pack()
-
-        ID_frame = customtkinter.CTkFrame(registration_frame, fg_color="transparent")
-        ID_frame.pack()
-
-        self.ID_visibility_button = customtkinter.CTkButton(ID_frame, image=self.imgUser,
-                                                                  text="",
-                                                                  width=20, height=20, fg_color="transparent",
-                                                                  bg_color="transparent", hover=False)
-        self.ID_visibility_button.pack(side="left", padx=(0, 0))
-
-        self.entry_ID = customtkinter.CTkEntry(ID_frame)
-        self.entry_ID.pack(side="left", padx=(0, 35))
 
         self.label_DOB = customtkinter.CTkLabel(registration_frame, text="DOB (DD/MM/YYYY):")
         self.label_DOB.pack()
@@ -596,14 +580,13 @@ class NexBank:
     def register_user(self):
         email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         dob = self.entry_DOB.get().strip()
-        ID = self.entry_ID.get().strip()
         contact = self.entry_contact.get().strip()
         confirmPassword = self.entry_confirmPassword.get()
         password = self.entry_password.get()
         email = self.entry_email.get()
         email = email.lower()
 
-        if not (dob and ID and contact and email and password and confirmPassword):
+        if not (dob and contact and email and password and confirmPassword):
             self.handle_error("Please fill in all fields")
             return
 
@@ -624,14 +607,6 @@ class NexBank:
             self.handle_error("You must be older than 18 years to register.")
             return
 
-        if not ID.isdigit():
-            self.handle_error("Please enter a valid ID Number")
-            return
-
-        if len(ID) != 13:
-            self.handle_error("Please enter a 13-digit ID Number")
-            return
-
         if not contact.isdigit():
             self.handle_error("Please enter a valid South African phone number")
             return
@@ -645,9 +620,6 @@ class NexBank:
             return
 
         for user in self.users.values():
-            if user.ID == ID:
-                self.handle_error("There is already an account with this ID Number.")
-                return
             if user.email == email:
                 self.handle_error("Email already registered. Please try a different email.")
                 return
@@ -669,7 +641,7 @@ class NexBank:
             return
 
         account_number = self.generate_account_number()
-        user = User(email, password, account_number, contact, ID, dob)
+        user = User(email, password, account_number, contact, dob)
         self.users[email] = user
         self.save_users()
         self.send_registration_email(email, password)
@@ -871,11 +843,10 @@ class NexBank:
         c.drawImage(logo_path, 50, 650, width=100, height=100)
 
         c.setFont("Helvetica", 12)
-        c.drawString(350, 730, "ID Number: " + self.logged_in_user.ID)
-        c.drawString(350, 715, "Contact Number: " + self.logged_in_user.contact)
-        c.drawString(350, 700, "DOB (DD/MM/YYYY): " + self.logged_in_user.dob)
-        c.drawString(350, 685, "Account Number: " + self.logged_in_user.account_number)
-        c.drawString(350, 670, "Email: " + self.logged_in_user.email)
+        c.drawString(350, 730, "Account Number: " + self.logged_in_user.account_number)
+        c.drawString(350, 715, "DOB (DD/MM/YYYY): " + self.logged_in_user.dob)
+        c.drawString(350, 700, "Contact Number: " + self.logged_in_user.contact)
+        c.drawString(350, 685, "Email: " + self.logged_in_user.email)
 
         c.setFont("Helvetica-Bold", 16)
         c.drawString(50, 600, "Transaction History")
@@ -971,14 +942,11 @@ class NexBank:
                                                       text=f"Account Number: {self.logged_in_user.account_number}")
         label_account_number.pack()
 
-        label_email = customtkinter.CTkLabel(details_frame, text=f"Contact Number: {self.logged_in_user.contact}")
-        label_email.pack()
+        label_contact = customtkinter.CTkLabel(details_frame, text=f"Contact Number: {self.logged_in_user.contact}")
+        label_contact.pack()
 
-        label_email = customtkinter.CTkLabel(details_frame, text=f"ID Number: {self.logged_in_user.ID}")
-        label_email.pack()
-
-        label_email = customtkinter.CTkLabel(details_frame, text=f"Date of Birth: {self.logged_in_user.dob}")
-        label_email.pack()
+        label_dob = customtkinter.CTkLabel(details_frame, text=f"Date of Birth: {self.logged_in_user.dob}")
+        label_dob.pack()
 
         label_balance = customtkinter.CTkLabel(details_frame, text=f"Balance: R{self.logged_in_user.balance:.2f}")
         label_balance.pack()
@@ -1082,11 +1050,10 @@ class NexBank:
         c.drawImage(logo_path, 50, 650, width=100, height=100)
 
         c.setFont("Helvetica", 12)
-        c.drawString(350, 730, "ID Number: " + self.logged_in_user.ID)
-        c.drawString(350, 715, "Contact Number: " + self.logged_in_user.contact)
-        c.drawString(350, 700, "DOB (DD/MM/YYYY): " + self.logged_in_user.dob)
-        c.drawString(350, 685, "Account Number: " + self.logged_in_user.account_number)
-        c.drawString(350, 670, "Email: " + self.logged_in_user.email)
+        c.drawString(350, 730, "Account Number: " + self.logged_in_user.account_number)
+        c.drawString(350, 715, "DOB (DD/MM/YYYY): " + self.logged_in_user.dob)
+        c.drawString(350, 700, "Contact Number: " + self.logged_in_user.contact)
+        c.drawString(350, 685, "Email: " + self.logged_in_user.email)
 
         c.setFont("Helvetica-Bold", 16)
         c.drawString(50, 600, "Transaction History")
