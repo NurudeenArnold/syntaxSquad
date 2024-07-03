@@ -43,6 +43,7 @@ class NexBank:
         self.users = {}
         self.load_users()
         self.current_frame = None
+        self.TandC = None
         self.root.resizable(False, False)
         self.create_main_window()
 
@@ -291,9 +292,9 @@ class NexBank:
         DOB_frame.pack()
 
         self.DOB_visibility_button = customtkinter.CTkButton(DOB_frame, image=self.imgUser,
-                                                                  text="",
-                                                                  width=20, height=20, fg_color="transparent",
-                                                                  bg_color="transparent", hover=False)
+                                                            text="",
+                                                            width=20, height=20, fg_color="transparent",
+                                                            bg_color="transparent", hover=False)
         self.DOB_visibility_button.pack(side="left", padx=(0, 0))
 
         self.entry_DOB = customtkinter.CTkEntry(DOB_frame)
@@ -306,9 +307,9 @@ class NexBank:
         contact_frame.pack()
 
         self.contact_visibility_button = customtkinter.CTkButton(contact_frame, image=self.imgPhone,
-                                                                  text="",
-                                                                  width=20, height=20, fg_color="transparent",
-                                                                  bg_color="transparent", hover=False)
+                                                                text="",
+                                                                width=20, height=20, fg_color="transparent",
+                                                                bg_color="transparent", hover=False)
         self.contact_visibility_button.pack(side="left", padx=(0, 0))
 
         self.entry_contact = customtkinter.CTkEntry(contact_frame)
@@ -321,9 +322,9 @@ class NexBank:
         email_frame.pack()
 
         self.email_visibility_button = customtkinter.CTkButton(email_frame, image=self.imgEmail,
-                                                                  text="",
-                                                                  width=20, height=20, fg_color="transparent",
-                                                                  bg_color="transparent", hover=False)
+                                                            text="",
+                                                            width=20, height=20, fg_color="transparent",
+                                                            bg_color="transparent", hover=False)
         self.email_visibility_button.pack(side="left", padx=(0, 0))
 
         self.entry_email = customtkinter.CTkEntry(email_frame)
@@ -336,18 +337,18 @@ class NexBank:
         password_frame.pack()
 
         self.password_button = customtkinter.CTkButton(password_frame, image=self.imgPassword,
-                                                                  command=self.toggle_password_visibility, text="",
-                                                                  width=20, height=20, fg_color="transparent",
-                                                                  bg_color="transparent", hover=False)
+                                                    command=self.toggle_password_visibility, text="",
+                                                    width=20, height=20, fg_color="transparent",
+                                                    bg_color="transparent", hover=False)
         self.password_button.pack(side="left", padx=(0, 0))
 
         self.entry_password = customtkinter.CTkEntry(password_frame, show="*")
         self.entry_password.pack(side="left", padx=(0, 0))
 
         self.password_visibility_button = customtkinter.CTkButton(password_frame, image=self.imgShow,
-                                                                  command=self.toggle_password_visibility, text="",
-                                                                  width=20, height=20, fg_color="transparent",
-                                                                  bg_color="transparent", hover=False)
+                                                                command=self.toggle_password_visibility, text="",
+                                                                width=20, height=20, fg_color="transparent",
+                                                                bg_color="transparent", hover=False)
         self.password_visibility_button.pack(side="left", padx=(0, 0))
 
         self.label_confirmPassword = customtkinter.CTkLabel(registration_frame, text="Confirm Password:")
@@ -357,28 +358,44 @@ class NexBank:
         confirm_password_frame.pack()
 
         self.confirm_password_visibility_button = customtkinter.CTkButton(confirm_password_frame, image=self.imgPassword,
-                                                                  text="",
-                                                                  width=20, height=20, fg_color="transparent",
-                                                                  bg_color="transparent", hover=False)
+                                                                        text="",
+                                                                        width=20, height=20, fg_color="transparent",
+                                                                        bg_color="transparent", hover=False)
         self.confirm_password_visibility_button.pack(side="left", padx=(0, 0))
 
         self.entry_confirmPassword = customtkinter.CTkEntry(confirm_password_frame, show="*")
         self.entry_confirmPassword.pack(side="left", padx=(0, 0))
 
         self.confirm_password_visibility_button2 = customtkinter.CTkButton(confirm_password_frame, image=self.imgShow,
-                                                                  command=self.toggle_password_visibility2, text="",
-                                                                  width=20, height=20, fg_color="transparent",
-                                                                  bg_color="transparent", hover=False)
+                                                                        command=self.toggle_password_visibility2, text="",
+                                                                        width=20, height=20, fg_color="transparent",
+                                                                        bg_color="transparent", hover=False)
         self.confirm_password_visibility_button2.pack(side="left", padx=(0, 0))
 
         self.var_generate_password = tk.BooleanVar()
         self.checkbutton_generate_password = customtkinter.CTkCheckBox(registration_frame, text="Generate password",
-                                                                       variable=self.var_generate_password,
-                                                                       command=self.toggle_password_entry)
+                                                                    variable=self.var_generate_password,
+                                                                    command=self.toggle_password_entry)
         self.checkbutton_generate_password.pack(pady=(10), padx=10)
 
         self.error_label_reg = customtkinter.CTkLabel(registration_frame, text="", text_color="red")
         self.error_label_reg.pack(padx=10)
+
+        confirm_TandC_frame = customtkinter.CTkFrame(registration_frame, fg_color="transparent")
+        confirm_TandC_frame.pack()
+
+        self.var_terms_conditions = tk.BooleanVar()
+        self.checkbutton_terms_conditions = customtkinter.CTkCheckBox(
+            confirm_TandC_frame, text="I agree to the ", variable=self.var_terms_conditions
+        )
+        self.checkbutton_terms_conditions.pack(side="left", pady=(0, 10))
+        self.checkbutton_terms_conditions.configure(state="disabled") 
+
+        self.link_terms = customtkinter.CTkLabel(
+            confirm_TandC_frame, text="Terms & Conditions", text_color="blue", cursor="hand2"
+        )
+        self.link_terms.pack(side="left", pady=(0, 10))
+        self.link_terms.bind("<Button-1>", self.create_TandC)
 
         self.button_register = customtkinter.CTkButton(registration_frame, text="Register", command=self.start_register_thread, corner_radius=32)
         self.button_register.pack(pady=(5, 30), padx=100)
@@ -638,6 +655,10 @@ class NexBank:
 
         if password != confirmPassword:
             self.handle_error("Passwords do not match.")
+            return
+        
+        if not self.var_terms_conditions.get():
+            self.handle_error("Terms & Conditions is required to be accepted.")
             return
 
         account_number = self.generate_account_number()
@@ -975,6 +996,48 @@ class NexBank:
         button_ok.pack(pady=10, padx=100)
 
         self.center_window(550, 300)
+
+    def create_TandC(self, event=None):
+        self.TandC = customtkinter.CTkToplevel(self.root)  
+        self.TandC.title("Terms & Conditions")
+        self.TandC.geometry("550x300")  
+
+        label_title = customtkinter.CTkLabel(
+            self.TandC, text="Terms & Conditions", 
+            font=("Helvetica", 25), text_color="red"
+        )
+        label_title.pack(pady=10, padx=30)
+
+        label_message = customtkinter.CTkLabel(
+            self.TandC, text="To keep the account open, the user needs to maintain a minimum balance of R500.\n"
+                         "Every transfer made will incur a charge of R10.\n"
+                         "Every loan taken out will incur a charge of R50.\n"
+                         "A user can only take out a loan if they have a balance of R500 or more.", 
+            font=("Helvetica", 12), text_color="black"
+        )
+        label_message.pack(pady=10, padx=30)
+
+        button_ok = customtkinter.CTkButton(
+            self.TandC, text="OK", 
+            command=self.setYes, corner_radius=32
+        )
+        button_ok.pack(pady=10, padx=100)
+
+        button_cancel = customtkinter.CTkButton(
+            self.TandC, text="Cancel", 
+            command=self.cancel, corner_radius=32
+        )
+        button_cancel.pack(pady=10, padx=100)
+
+
+    def setYes(self):
+        self.var_terms_conditions.set(True)
+        self.checkbutton_terms_conditions.configure(state="normal")
+        self.TandC.destroy()
+
+    def cancel(self):
+        self.checkbutton_terms_conditions.configure(state="normal")
+        self.TandC.destroy()
 
     def is_strong_password(self, password):
         has_lower = any(c.islower() for c in password)
