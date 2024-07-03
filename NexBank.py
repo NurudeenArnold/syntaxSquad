@@ -998,9 +998,10 @@ class NexBank:
         self.center_window(550, 300)
 
     def create_TandC(self, event=None):
-        self.TandC = customtkinter.CTkToplevel(self.root)  
+        self.TandC = tk.Toplevel(self.root)  
         self.TandC.title("Terms & Conditions")
-        self.TandC.geometry("550x300")  
+        self.TandC.geometry("400x300")  
+        self.TandC.iconbitmap("icon.ico")
 
         label_title = customtkinter.CTkLabel(
             self.TandC, text="Terms & Conditions", 
@@ -1009,10 +1010,10 @@ class NexBank:
         label_title.pack(pady=10, padx=30)
 
         label_message = customtkinter.CTkLabel(
-            self.TandC, text="To keep the account open, the user needs to maintain a minimum balance of R500.\n"
+            self.TandC, text="To keep the account open, the user needs to \nmaintain a minimum balance of R500.\n"
                          "Every transfer made will incur a charge of R10.\n"
                          "Every loan taken out will incur a charge of R50.\n"
-                         "A user can only take out a loan if they have a balance of R500 or more.", 
+                         "A user can only take out a loan if they have \na balance of R500 or more.", 
             font=("Helvetica", 12), text_color="black"
         )
         label_message.pack(pady=10, padx=30)
