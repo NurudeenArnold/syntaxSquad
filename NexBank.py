@@ -392,7 +392,7 @@ class NexBank:
         self.checkbutton_terms_conditions.configure(state="disabled") 
 
         self.link_terms = customtkinter.CTkLabel(
-            confirm_TandC_frame, text="Terms & Conditions", text_color="blue", cursor="hand2"
+            confirm_TandC_frame, text="Terms & Conditions", text_color="red", cursor="hand2"
         )
         self.link_terms.pack(side="left", pady=(0, 10))
         self.link_terms.bind("<Button-1>", self.create_TandC)
