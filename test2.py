@@ -1384,6 +1384,12 @@ class RegisterWelcomePanel:
         self.label_register_welcome = ctk.CTkLabel(self.frame, text="Registration Welcome", font=("Helvetica", 25), text_color="#B22E2E")
         self.label_register_welcome.pack(pady=10)
 
+        image = PhotoImage(file="nexbank2.png")
+        resizedImage = image.subsample(1, 1)
+        self.image_label = ctk.CTkLabel(self.frame, image=resizedImage, text="")
+        self.image_label.image = resizedImage
+        self.image_label.pack(pady=20)
+        
     def animate(self, direction):
         if direction == "forward" and self.in_start_pos:
             self.animate_forward()
