@@ -662,9 +662,7 @@ class NexBank(ctk.CTk):
         self.liftAll()
 
     def quit_application(self):
-        """ self.root.quit() """
-        self.dashboard_panel.show_panel()
-        self.view_balance()
+        self.root.quit()
 
     def clear_window(self):
         for widget in self.root.winfo_children():
