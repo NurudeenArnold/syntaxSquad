@@ -323,7 +323,7 @@ class NexBank(ctk.CTk):
             no_transactions_label.pack(pady=10, padx=(30, 0))
         else:
             for transaction in self.logged_in_user.transactions:
-                transaction_label = ctk.CTkLabel(frame, text=transaction, wraplength=400, justify="center")
+                transaction_label = ctk.CTkLabel(frame, text=transaction, wraplength=600, justify="center")
                 transaction_label.pack(pady=5, padx=(30, 0))
 
         self.error_label_pdf = ctk.CTkLabel(frame, text="", text_color="red")
@@ -346,7 +346,7 @@ class NexBank(ctk.CTk):
 
     def start_emailPDF_thread(self):
         self.button_email.configure(text="Sending\nPlease Wait...")
-        self.disable_window()
+
         forgot_thread = threading.Thread(target=self.send_pdf_via_email)
         forgot_thread.start()
     
@@ -1361,7 +1361,7 @@ class CenteredPanel:
         self.master = parent
         self.root = parent.root
         
-        self.width = 0.4
+        self.width = 0.6
         self.height = 0.9  
         self.start_pos = -0.9  
         self.end_pos = 0.04  
