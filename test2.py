@@ -119,7 +119,7 @@ class NexBank(ctk.CTk):
         label_main.pack(pady=50)
 
         image = Image.open("nexbank2.png")
-        resizedImage = image.resize((200, 200), Image.LANCZOS)
+        resizedImage = image.resize((300, 300), Image.LANCZOS)
         img = ImageTk.PhotoImage(resizedImage)
         image_label = ctk.CTkLabel(self.root, image=img, text="")
         image_label.image = img
@@ -138,7 +138,7 @@ class NexBank(ctk.CTk):
         self.clear_window()
 
         image = PhotoImage(file="nexbank2.png")
-        resizedImage = image.subsample(2, 2)
+        resizedImage = image.subsample(1, 1)
 
         self.image_label = ctk.CTkLabel(self.root, image=resizedImage, text="")
         self.image_label.image = resizedImage
@@ -179,7 +179,7 @@ class NexBank(ctk.CTk):
         self.liftAll()
 
         image = PhotoImage(file="nexbank2.png")
-        resizedImage = image.subsample(2, 2)
+        resizedImage = image.subsample(1, 1)
         self.image_label = ctk.CTkLabel(self.dashboard_panel.frame, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
@@ -200,7 +200,7 @@ class NexBank(ctk.CTk):
         self.liftAll()
 
         image = PhotoImage(file="nexbank2.png")
-        resizedImage = image.subsample(2, 2)
+        resizedImage = image.subsample(1, 1)
         self.image_label = ctk.CTkLabel(self.dashboard_panel.frame, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
@@ -298,7 +298,7 @@ class NexBank(ctk.CTk):
         self.load_transaction_history(self.logged_in_user.email)
 
         image = PhotoImage(file="nexbank2.png")
-        resizedImage = image.subsample(2, 2)
+        resizedImage = image.subsample(1, 1)
         self.image_label = ctk.CTkLabel(self.dashboard_panel.frame, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
@@ -351,7 +351,7 @@ class NexBank(ctk.CTk):
         forgot_thread.start()
     
     def enable_window(self):
-        for widget in self.root.winfo_children():
+        for widget in self.login_panel.frame.winfo_children():
             if isinstance(widget, (ctk.CTkButton, ctk.CTkEntry, ctk.CTkCheckBox)):
                 self.enable_widget(widget)
             for child in widget.winfo_children():
@@ -372,7 +372,7 @@ class NexBank(ctk.CTk):
 
     def disable_window(self):
         print("window disabled")
-        for widget in self.root.winfo_children():
+        for widget in self.login_panel.frame.winfo_children():
             if isinstance(widget, (ctk.CTkButton, ctk.CTkEntry, ctk.CTkCheckBox)):
                 self.disable_widget(widget)
             for child in widget.winfo_children():
@@ -540,7 +540,7 @@ class NexBank(ctk.CTk):
         self.liftAll()
 
         image = PhotoImage(file="nexbank2.png")
-        resizedImage = image.subsample(2, 2)
+        resizedImage = image.subsample(1, 1)
         self.image_label = ctk.CTkLabel(self.dashboard_panel.frame, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
@@ -594,26 +594,13 @@ class NexBank(ctk.CTk):
             self.error_label_loan.configure(text="Insufficient balance to cover bank charges.")
             return
         
-        # Deduct bank charges from the user's balance
         self.logged_in_user.balance -= bank_charges
-
-        # Add loan amount to the user's balance
         self.logged_in_user.balance += amount
-
-        # Create transaction details
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         transaction_details = f"Loan of R{amount:.2f} received on {timestamp}, Bank Charges: R{bank_charges:.2f}"
-
-        # Append transaction to user's transaction history
         self.logged_in_user.transactions.append(transaction_details)
-
-        # Save updated user data
         self.save_users()
-
-        # Log transaction to the transaction log
         self.save_transaction_log(self.logged_in_user.email, transaction_details)
-
-        # Update UI with success message
         self.error_label_loan.configure(text="Loan approved and credited to your account.", text_color="green")
         self.create_popup("Loan Accepted", f"Loan of R{amount:.2f} received on {timestamp}.\nBank Charges: R{bank_charges:.2f}")
 
@@ -624,7 +611,7 @@ class NexBank(ctk.CTk):
         self.liftAll()
 
         image = PhotoImage(file="nexbank2.png")
-        resizedImage = image.subsample(2, 2)
+        resizedImage = image.subsample(1, 1)
         self.image_label = ctk.CTkLabel(self.dashboard_panel.frame, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
@@ -761,12 +748,75 @@ class LoginPanel:
         self.button_login = ctk.CTkButton(login_frame, text="Login", command=self.login_user, corner_radius=32)
         self.button_login.pack(pady=(5, 10), padx=100)
 
-        self.button_forgot_password = ctk.CTkButton(login_frame, text="Forgot Password", corner_radius=32)
+        self.button_forgot_password = ctk.CTkButton(login_frame, text="Forgot Password", command=self.start_forgot_thread, corner_radius=32)
         self.button_forgot_password.pack(pady=(5, 10), padx=100)
 
         self.button_back = ctk.CTkButton(login_frame, text="Back", command=self.hideLoginPanels, corner_radius=32)
         self.button_back.pack(pady=(5, 10), padx=100)
 
+
+    def start_forgot_thread(self):
+        self.button_forgot_password.configure(text="Please Wait...")
+        self.master.disable_window()
+        forgot_thread = threading.Thread(target=self.forgot_password)
+        forgot_thread.start()
+
+    def handle_forgot_password_error(self, message):
+        self.error_label.configure(text=message)
+        self.reset_forgot_password_button()
+        self.master.enable_window()
+
+    def reset_forgot_password_button(self):
+        self.root.after(0, lambda: self.button_forgot_password.configure(text="Forgot Password"))
+
+    def forgot_password(self):
+        email = self.entry_email.get().strip()
+
+        if not email:
+            self.handle_forgot_password_error("Please enter your email address.")
+            return
+
+        user = self.master.users.get(email)
+        if not user:
+            self.handle_forgot_password_error("Email address not found.")
+            return
+
+        new_password = self.generate_temporary_password()
+        user.password = new_password
+
+        self.send_reset_email(email, new_password)
+        self.master.save_users()
+
+        self.error_label.configure(text="A new password has been sent to your email.", text_color="green")
+        self.reset_forgot_password_button()
+        self.master.enable_window()
+
+    def generate_temporary_password(self, length=8):
+        characters = string.ascii_letters + string.digits + string.punctuation
+        return ''.join(random.choice(characters) for i in range(length))
+    
+    def send_reset_email(self, recipient_email, new_password):
+        sender_email = "sewparsad60@gmail.com"  
+        sender_password = "xahk ahrn vvyl lgua"  
+        subject = " NexBank Password Reset"
+
+        message = MIMEMultipart()
+        message['From'] =  "Nex Bank"
+        message['To'] = recipient_email
+        message['Subject'] = subject
+
+        body = f"Dear NexBank Customer,\n\n Your new password is: {new_password}\n\nPlease apply your new password when logging in.\n\nBest regards,\nNexBank Team"
+        message.attach(MIMEText(body, 'plain'))
+
+        try:
+            server = smtplib.SMTP('smtp.gmail.com', 587)  
+            server.starttls()
+            server.login(sender_email, sender_password)
+            text = message.as_string()
+            server.sendmail(sender_email, recipient_email, text)
+            server.quit()
+        except Exception as e:
+            self.error_label.configure(text=f"Failed to send email: {str(e)}")
 
     def toggle_password_visibility(self):
         if self.entry_password.cget("show") == "":
@@ -842,8 +892,14 @@ class WelcomePanel:
         self.create_welcome_message()
 
     def create_welcome_message(self):
-        label_welcome = ctk.CTkLabel(self.frame, text="Welcome", font=("Helvetica", 25), text_color="#B22E2E")
+        label_welcome = ctk.CTkLabel(self.frame, text="Welcome to NexBank", font=("Helvetica", 25), text_color="#B22E2E")
         label_welcome.pack(pady=10)
+
+        image = PhotoImage(file="nexbank2.png")
+        resizedImage = image.subsample(1, 1)
+        self.image_label = ctk.CTkLabel(self.frame, image=resizedImage, text="")
+        self.image_label.image = resizedImage
+        self.image_label.pack(pady=20)
 
     def show_panel(self):
         self.animate("forward")
