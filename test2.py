@@ -38,12 +38,11 @@ class NexBank(ctk.CTk):
     def __init__(self, root):
         self.root = root
         self.root.title("NexBank")
-        self.root.geometry("1200x950")
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
         x = (screen_width // 2) - (1200 // 2)
-        y = (screen_height // 2) - (950 // 2)
-        self.root.geometry(f"1200x950+{x}+{y}")
+        y = (screen_height // 2) - (925 // 2)
+        self.root.geometry(f"1200x925+{x}+{y}")
 
         self.logged_in_user = None
         self.users = {}
@@ -752,7 +751,7 @@ class LoginPanel:
                                                         bg_color="transparent", hover=False)
         self.password_visibility_button.pack(side="left", padx=(0, 0))
 
-        self.button_forgot_password = ctk.CTkButton(login_frame, text="forgot password ?", command=self.start_forgot_thread, 
+        self.button_forgot_password = ctk.CTkButton(login_frame, text="Forgot password?", command=self.start_forgot_thread, 
                                                     corner_radius=32, fg_color="transparent", 
                                                     text_color="red", hover_color="white",
                                                     font=("Helvetica", 12, "underline"))
@@ -872,6 +871,7 @@ class LoginPanel:
         if email in self.master.users and self.master.users[email].password == password:
             self.master.logged_in_user = self.master.users[email]
             self.master.open_dashboard()
+            time.sleep(0.5)
             self.hideLoginPanels()
             self.entry_email.delete(0, 'end')
             self.entry_password.delete(0, 'end')
@@ -1005,6 +1005,18 @@ class RegisterPanel:
 
         self.label_subtitle = ctk.CTkLabel(registration_frame, text="Welcome! Please enter your details", font=("Helvetica", 15), text_color="grey50", corner_radius=32)
         self.label_subtitle.pack(pady=(5, 10))
+
+        self.label_ID = ctk.CTkLabel(registration_frame, text="South African ID Number:")
+        self.label_ID.pack()
+
+        ID_frame = ctk.CTkFrame(registration_frame, fg_color="transparent")
+        ID_frame.pack()
+
+        self.ID_visibility_button = ctk.CTkButton(ID_frame, image=self.imgUser, text="", width=20, height=20, fg_color="transparent", bg_color="transparent", hover=False)
+        self.ID_visibility_button.pack(side="left", padx=(0, 0))
+
+        self.entry_ID = ctk.CTkEntry(ID_frame, width=250, height=40, font=("Helvetica", 15))
+        self.entry_ID.pack(side="left", padx=(0, 42))
 
         self.label_DOB = ctk.CTkLabel(registration_frame, text="DOB (DD/MM/YYYY):")
         self.label_DOB.pack()
