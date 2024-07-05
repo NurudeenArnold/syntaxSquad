@@ -62,8 +62,8 @@ class NexBank(ctk.CTk):
         self.register_welcome_panel.hide_panel()
         self.dashboard_panel.hide_panel()
 
-        #self.main_window()
-        self.open_dashboard() #TEST ?////////////////////////////////////////////////////////////////////////
+        self.main_window()
+        #self.open_dashboard() #TEST ?////////////////////////////////////////////////////////////////////////
 
     def load_users(self):
         try:
