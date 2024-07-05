@@ -41,8 +41,8 @@ class NexBank(ctk.CTk):
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
         x = (screen_width // 2) - (1200 // 2)
-        y = (screen_height // 2) - (925 // 2)
-        self.root.geometry(f"1200x925+{x}+{y}")
+        y = (screen_height // 2) - (1000 // 2)
+        self.root.geometry(f"1200x1000+{x}+{y}")
 
         self.logged_in_user = None
         self.users = {}
