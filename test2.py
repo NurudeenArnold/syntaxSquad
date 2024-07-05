@@ -767,17 +767,17 @@ class LoginPanel:
         register_frame = ctk.CTkFrame(login_frame, fg_color="transparent")
         register_frame.pack(pady=(0, 30))
 
-        self.button_forgot_password = ctk.CTkLabel(register_frame, text="Don't have an account ?", 
+        self.label_sign_up = ctk.CTkLabel(register_frame, text="Don't have an account ?", 
                                                     fg_color="transparent", 
                                                     text_color="grey50",
                                                     font=("Helvetica", 12))
-        self.button_forgot_password.pack(padx=(60, 0), side="left")
+        self.label_sign_up.pack(padx=(60, 0), side="left")
 
-        self.button_forgot_password = ctk.CTkButton(register_frame, text="Sign up", command=self.SignUpButton,
+        self.button_sign_up = ctk.CTkButton(register_frame, text="Sign up", command=self.SignUpButton,
                                                     fg_color="transparent", 
                                                     hover_color="white", text_color="red",
                                                     font=("Helvetica", 12, "underline"))
-        self.button_forgot_password.pack(padx=(0, 60), side="left")
+        self.button_sign_up.pack(padx=(0, 60), side="left")
 
     def SignUpButton(self):
         self.hideLoginPanels()
@@ -995,10 +995,10 @@ class RegisterPanel:
 
     def create_registration_form(self):
         registration_frame = ctk.CTkFrame(self.frame, corner_radius=32)
-        registration_frame.pack(padx=10, pady=10)
+        registration_frame.pack(padx=50, pady=30)
 
         self.label_register = ctk.CTkLabel(registration_frame, text="Register", font=("Helvetica", 40), text_color="#B22E2E", corner_radius=32)
-        self.label_register.pack(pady=10)
+        self.label_register.pack(pady=(30, 5))
 
         self.label_subtitle = ctk.CTkLabel(registration_frame, text="Welcome! Please enter your details", font=("Helvetica", 15), text_color="grey50", corner_radius=32)
         self.label_subtitle.pack(pady=(5, 10))
@@ -1013,7 +1013,7 @@ class RegisterPanel:
         self.DOB_visibility_button.pack(side="left", padx=(0, 0))
 
         self.entry_DOB = ctk.CTkEntry(DOB_frame, width=250, height=40, font=("Helvetica", 15))
-        self.entry_DOB.pack(side="left", padx=(0, 35))
+        self.entry_DOB.pack(side="left", padx=(0, 42))
 
         self.label_contact = ctk.CTkLabel(registration_frame, text="Contact Number:")
         self.label_contact.pack()
@@ -1025,7 +1025,7 @@ class RegisterPanel:
         self.contact_visibility_button.pack(side="left", padx=(0, 0))
 
         self.entry_contact = ctk.CTkEntry(contact_frame, width=250, height=40, font=("Helvetica", 15))
-        self.entry_contact.pack(side="left", padx=(0, 35))
+        self.entry_contact.pack(side="left", padx=(0, 42))
 
         self.label_email = ctk.CTkLabel(registration_frame, text="Email:")
         self.label_email.pack()
@@ -1037,7 +1037,7 @@ class RegisterPanel:
         self.email_visibility_button.pack(side="left", padx=(0, 0))
 
         self.entry_email = ctk.CTkEntry(email_frame, width=250, height=40, font=("Helvetica", 15))
-        self.entry_email.pack(side="left", padx=(0, 35))
+        self.entry_email.pack(side="left", padx=(0, 42))
 
         self.label_password = ctk.CTkLabel(registration_frame, text="Password:")
         self.label_password.pack()
@@ -1089,11 +1089,37 @@ class RegisterPanel:
         self.link_terms.bind("<Button-1>", self.create_TandC)
 
         self.button_register = ctk.CTkButton(registration_frame, text="Register", command=self.start_register_thread, corner_radius=32, font=("Helvetica", 20), width=250, height=40, text_color="white")
-        self.button_register.pack(pady=(5, 30))
+        self.button_register.pack(pady=(0, 10))
 
         self.button_back = ctk.CTkButton(registration_frame, text="Back", command=self.hideRegisterPanels, corner_radius=32, font=("Helvetica", 20), width=250, height=40, text_color="white")
-        self.button_back.pack(pady=(5, 30))
+        self.button_back.pack(pady=(0, 30))
 
+        signup_frame = ctk.CTkFrame(registration_frame, fg_color="transparent")
+        signup_frame.pack(pady=(0, 30))
+
+        self.label_sign_up = ctk.CTkLabel(signup_frame, text="Already have an account ?", 
+                                                    fg_color="transparent", 
+                                                    text_color="grey50",
+                                                    font=("Helvetica", 12))
+        self.label_sign_up.pack(padx=(60, 0), side="left")
+
+        self.button_sign_up = ctk.CTkButton(signup_frame, text="Log in", command=self.LogInButton,
+                                                    fg_color="transparent", 
+                                                    hover_color="white", text_color="red",
+                                                    font=("Helvetica", 12, "underline"))
+        self.button_sign_up.pack(padx=(0, 60), side="left")
+
+    def LogInButton(self):
+        self.hideRegisterPanels()
+        self.showLoginPanels()
+
+    def hideRegisterPanels(self):
+        self.master.register_panel.hide_panel()
+        self.master.register_welcome_panel.hide_panel()
+
+    def showLoginPanels(self):
+        self.master.login_panel.show_panel()
+        self.master.welcome_panel.show_panel()
 
     def toggle_password_visibility(self):
         if self.entry_password.cget("show") == "":
