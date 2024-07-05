@@ -42,7 +42,7 @@ class NexBank(ctk.CTk):
         screen_height = self.root.winfo_screenheight()
         x = (screen_width // 2) - (1200 // 2)
         y = (screen_height // 2) - (1000 // 2)
-        self.root.geometry(f"1200x1000+{x}+{y}")
+        self.root.geometry(f"1200x1000+{x}+{y - 40}")
 
         self.logged_in_user = None
         self.users = {}
@@ -62,7 +62,8 @@ class NexBank(ctk.CTk):
         self.register_welcome_panel.hide_panel()
         self.dashboard_panel.hide_panel()
 
-        self.main_window()
+        #self.main_window()
+        self.open_dashboard() #TEST ?////////////////////////////////////////////////////////////////////////
 
     def load_users(self):
         try:
@@ -143,47 +144,53 @@ class NexBank(ctk.CTk):
     def open_dashboard(self):
         self.clear_window()
 
-        image = PhotoImage(file="nexbank2.png")
-        resizedImage = image.subsample(1, 1)
+        logo_image = PhotoImage(file="nexbank2.png")
+        resized_logo = logo_image.subsample(3, 3)
 
-        self.image_label = ctk.CTkLabel(self.root, image=resizedImage, text="")
-        self.image_label.image = resizedImage
-        self.image_label.pack(pady=50)
+        panel_menu_frame = ctk.CTkFrame(self.root, fg_color="#B22E2E", width=100, corner_radius=32)
+        panel_menu_frame.pack(side="left", fill="y", padx=(20, 10), pady=(28))
 
-        self.label_title = ctk.CTkLabel(self.root, text="Dashboard", font=("Helvetica", 25), text_color="#B22E2E")
-        self.label_title.pack(pady=10)
+        logo_dashboard_frame = ctk.CTkFrame(panel_menu_frame, fg_color="transparent")
+        logo_dashboard_frame.pack(pady=(10, 5), padx=10, anchor="w")
 
-        self.button_balance = ctk.CTkButton(self.root, text="View Balance", command=self.view_balance, corner_radius=32)
-        self.button_balance.pack(pady=10)
+        logo_label = ctk.CTkLabel(logo_dashboard_frame, image=resized_logo, text="")
+        logo_label.image = resized_logo
+        logo_label.pack(side="left")
 
-        self.button_transfer = ctk.CTkButton(self.root, text="Transfer Money", command=self.transfer_money, corner_radius=32)
-        self.button_transfer.pack(pady=10)
+        dashboard_title = ctk.CTkLabel(logo_dashboard_frame, text="Dashboard", font=("Helvetica", 25, "bold"), text_color="white")
+        dashboard_title.pack(side="left", padx=10, pady=(65))
 
-        self.button_statement = ctk.CTkButton(self.root, text="View Bank Statement",
-                                                        command=self.view_statement, corner_radius=32)
-        self.button_statement.pack(pady=10)
+        menu_options = [
+            ("View Balance", self.view_balance, "view_balance.png"),
+            ("Transfer Money", self.transfer_money, "transfer_money.png"),
+            ("View Bank Statement", self.view_statement, "view_statement.png"),
+            ("Take Loan/Overdraft", self.take_loan, "take_loan.png"),
+            ("View Personal Details", self.view_personal_details, "view_personal_details.png")
+        ]
 
-        self.button_loan = ctk.CTkButton(self.root, text="Take Loan/Overdraft", command=self.take_loan, corner_radius=32)
-        self.button_loan.pack(pady=10)
+        for option in menu_options:
+            option_icon = PhotoImage(file=option[2]).subsample(1)
+            option_button = ctk.CTkButton(panel_menu_frame, text=option[0], command=option[1],
+                                        corner_radius=32, height=60, fg_color="transparent",
+                                        font=("Helvetica", 15, "bold"), image=option_icon)
+            option_button.pack(fill="x", padx=(20, 10), pady=(30))
 
-        self.button_personal_details = ctk.CTkButton(self.root, text="View Personal Details",
-                                                               command=self.view_personal_details, corner_radius=32)
-        self.button_personal_details.pack(pady=10)
+        logout_icon = PhotoImage(file="logout.png").subsample(1)
+        logout_button = ctk.CTkButton(panel_menu_frame, text="Logout", command=self.logout,
+                                    corner_radius=32, height=60, fg_color="transparent",
+                                    font=("Helvetica", 15, "bold"), image=logout_icon)
+        logout_button.pack(side="bottom", fill="x", padx=20, pady=(30))
 
-        self.button_logout = ctk.CTkButton(self.root, text="Logout", command=self.logout, corner_radius=32)
-        self.button_logout.pack(pady=10)
+        self.root.pack_propagate(False)
 
     def logout(self):
+        self.dashboard_panel.hide_panel()
         self.login_panel.show_panel()
         self.welcome_panel.show_panel()
         self.main_window()
         self.liftAll()
 
-    def view_balance(self):
-        self.dashboard_panel.show_panel()
-        self.clear_panel()
-        self.liftAll()
-
+    def view_balance_comp(self):
         image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(1, 1)
         self.image_label = ctk.CTkLabel(self.dashboard_panel.frame, image=resizedImage, text="")
@@ -191,20 +198,34 @@ class NexBank(ctk.CTk):
         self.image_label.pack(pady=20)
 
         label_balance = ctk.CTkLabel(self.dashboard_panel.frame, text=f"Your Balance: R{self.logged_in_user.balance:.2f}",
-                                               font=("Helvetica", 20))
+                                                font=("Helvetica", 20))
         label_balance.pack(pady=20)
 
         button_back = ctk.CTkButton(self.dashboard_panel.frame, text="Back", command=self.backDashboard, corner_radius=32)
         button_back.pack(pady=10)
-    
+
+    def view_balance(self):
+            self.isOpenedCheck(self.view_balance_comp)
+
+    def isOpenedCheck(self, fun):
+        if self.dashboard_panel.in_start_pos:
+            self.clear_panel()
+            fun()
+            self.dashboard_panel.show_panel()
+            self.liftAll()
+        else: 
+            self.dashboard_panel.hide_panel()
+            root.after(750, lambda: (
+            self.clear_panel(),
+            self.liftAll(),
+            fun(),
+            self.dashboard_panel.show_panel()
+            ))
+
     def backDashboard(self):
         self.dashboard_panel.hide_panel()
-
-    def transfer_money(self):
-        self.dashboard_panel.show_panel()
-        self.clear_panel()
-        self.liftAll()
-
+    
+    def transfer_money_comp(self):
         image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(1, 1)
         self.image_label = ctk.CTkLabel(self.dashboard_panel.frame, image=resizedImage, text="")
@@ -237,6 +258,9 @@ class NexBank(ctk.CTk):
 
         button_back = ctk.CTkButton(transfer_frame, text="Back", command=self.backDashboard, corner_radius=32)
         button_back.pack(pady=(5, 30), padx=100)
+
+    def transfer_money(self):
+        self.isOpenedCheck(self.transfer_money_comp)
 
     def process_transfer(self):
             account_number = self.entry_account_number.get()
@@ -297,12 +321,7 @@ class NexBank(ctk.CTk):
                             f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}. \n Bank charges: R{bank_charges:.2f}",
                             )
 
-    def view_statement(self):
-        self.dashboard_panel.show_panel()
-        self.clear_panel()
-        self.liftAll()
-        self.load_transaction_history(self.logged_in_user.email)
-
+    def view_statement_comp(self):
         image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(1, 1)
         self.image_label = ctk.CTkLabel(self.dashboard_panel.frame, image=resizedImage, text="")
@@ -345,6 +364,9 @@ class NexBank(ctk.CTk):
 
         button_back = ctk.CTkButton(frame, text="Back", command=self.backDashboard, corner_radius=32)
         button_back.pack(pady=10, padx=(30, 0))
+
+    def view_statement(self):
+        self.isOpenedCheck(self.view_statement_comp)
 
     def start_download_thread(self):
         download_thread = threading.Thread(target=self.download_transaction_history)
@@ -540,11 +562,7 @@ class NexBank(ctk.CTk):
         c.save()
         print(f"Transaction history saved to {pdf_filename}")
 
-    def take_loan(self):
-        self.dashboard_panel.show_panel()
-        self.clear_panel()
-        self.liftAll()
-
+    def take_loan_comp(self):
         image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(1, 1)
         self.image_label = ctk.CTkLabel(self.dashboard_panel.frame, image=resizedImage, text="")
@@ -572,6 +590,9 @@ class NexBank(ctk.CTk):
 
         button_back = ctk.CTkButton(loan_frame, text="Back", command=self.backDashboard, corner_radius=32)
         button_back.pack(pady=(5, 30), padx=100)
+
+    def take_loan(self):
+        self.isOpenedCheck(self.take_loan_comp)
     
     def process_loan(self):
         amount_str = self.entry_loan_amount.get()
@@ -611,11 +632,7 @@ class NexBank(ctk.CTk):
         self.create_popup("Loan Accepted", f"Loan of R{amount:.2f} received on {timestamp}.\nBank Charges: R{bank_charges:.2f}")
 
 
-    def view_personal_details(self):
-        self.dashboard_panel.show_panel()
-        self.clear_panel()
-        self.liftAll()
-
+    def view_personal_details_comp(self):
         image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(1, 1)
         self.image_label = ctk.CTkLabel(self.dashboard_panel.frame, image=resizedImage, text="")
@@ -648,6 +665,8 @@ class NexBank(ctk.CTk):
         button_back = ctk.CTkButton(details_frame, text="Back", command=self.backDashboard, corner_radius=32)
         button_back.pack(pady=10, padx=100)
 
+    def view_personal_details(self):
+        self.isOpenedCheck(self.view_personal_details_comp)
 
     def show_login_and_welcome(self):
         self.login_panel.show_panel()
@@ -1486,16 +1505,14 @@ class CenteredPanel:
     def __init__(self, parent):
         self.master = parent
         self.root = parent.root
-        
-        self.width = 0.6
-        self.height = 0.9  
-        self.start_pos = -0.9  
-        self.end_pos = 0.04  
+        self.width = 0.65
+        self.start_pos = 1.0  
+        self.end_pos = 0.325
         self.pos = self.start_pos
         self.in_start_pos = True
 
-        self.frame = ctk.CTkFrame(self.root)
-        self.frame.place(relx=0.5, rely=self.start_pos, relwidth=self.width, relheight=self.height, anchor="n")
+        self.frame = ctk.CTkFrame(self.root, corner_radius=32)
+        self.frame.place(relx=self.start_pos, rely=0.03, relwidth=self.width, relheight=0.94)
 
         self.create_content()
 
@@ -1504,32 +1521,32 @@ class CenteredPanel:
         self.label_register_welcome.pack(pady=10)
 
     def animate(self, direction):
-        if direction == "down" and self.in_start_pos:
-            self.animate_down()
-        elif direction == "up" and not self.in_start_pos:
-            self.animate_up()
+        if direction == "forward" and self.in_start_pos:
+            self.animate_forward()
+        elif direction == "backward" and not self.in_start_pos:
+            self.animate_backwards()
 
-    def animate_down(self):
-        if self.pos < self.end_pos:
-            self.pos += 0.02  
-            self.frame.place(relx=0.5, rely=self.pos, relwidth=self.width, relheight=self.height, anchor="n")
-            self.frame.after(10, self.animate_down)
+    def animate_forward(self):
+        if self.pos > self.end_pos:
+            self.pos -= 0.015
+            self.frame.place(relx=self.pos, rely=0.03, relwidth=self.width, relheight=0.94)
+            self.frame.after(10, self.animate_forward)
         else:
             self.in_start_pos = False
 
-    def animate_up(self):
-        if self.pos > self.start_pos:
-            self.pos -= 0.02  
-            self.frame.place(relx=0.5, rely=self.pos, relwidth=self.width, relheight=self.height, anchor="n")
-            self.frame.after(10, self.animate_up)
+    def animate_backwards(self):
+        if self.pos < self.start_pos:
+            self.pos += 0.015
+            self.frame.place(relx=self.pos, rely=0.03, relwidth=self.width, relheight=0.94)
+            self.frame.after(10, self.animate_backwards)
         else:
             self.in_start_pos = True
 
     def hide_panel(self):
-        self.animate("up")
-
+        self.animate("backward")
+    
     def show_panel(self):
-        self.animate("down")
+        self.animate("forward")
 
 if __name__ == "__main__":
     root = tk.Tk()
