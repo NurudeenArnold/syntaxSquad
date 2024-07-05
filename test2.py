@@ -119,43 +119,27 @@ class NexBank(ctk.CTk):
     def main_window(self):
         self.clear_window()
 
-        self.root.update_idletasks()  
-        width = self.root.winfo_width()
-        height = self.root.winfo_height()
-
-        image_path = "background.jpeg"
-        if not os.path.exists(image_path):
-            print("Image file not found!")
-        else:
-            background_image = Image.open(image_path)
-            background_image = background_image.resize((width, height), Image.LANCZOS)
-            self.background_image_tk = ImageTk.PhotoImage(background_image)
-
-            self.background_label = ctk.CTkLabel(self.root, image=self.background_image_tk, text="")
-            self.background_label.image = self.background_image_tk  
-            self.background_label.place(relx=0.5, rely=0.5, anchor="center")
-
         mainframe = ctk.CTkFrame(self.root, corner_radius=32)
-        mainframe.pack(padx=50, pady=30)
+        mainframe.pack(padx=50, pady=(50, 30))
     
-        label_main = ctk.CTkLabel(self.root, text="Welcome to NexBank!", font=("Verdana", 25), text_color="#B22E2E")
+        label_main = ctk.CTkLabel(mainframe, text="Welcome to NexBank!", font=("Verdana", 40, "bold"), text_color="#B22E2E")
         label_main.pack(pady=50)
 
         image = Image.open("nexbank2.png")
-        resizedImage = image.resize((300, 300), Image.LANCZOS)
+        resizedImage = image.resize((350, 350), Image.LANCZOS)
         img = ImageTk.PhotoImage(resizedImage)
-        image_label = ctk.CTkLabel(self.root, image=img, text="")
+        image_label = ctk.CTkLabel(mainframe, image=img, text="")
         image_label.image = img
         image_label.pack(pady=20)
 
-        button_login = ctk.CTkButton(self.root, text="Login", command=self.show_login_and_welcome, corner_radius=32)
+        button_login = ctk.CTkButton(mainframe, text="Login", command=self.show_login_and_welcome, corner_radius=32, font=("Helvetica", 20), width=250, height=40, text_color="white")
         button_login.pack(pady=10)
 
-        button_register = ctk.CTkButton(self.root, text="Register", command=self.open_registration_window, corner_radius=32)
+        button_register = ctk.CTkButton(mainframe, text="Register", command=self.open_registration_window, corner_radius=32, font=("Helvetica", 20), width=250, height=40, text_color="white")
         button_register.pack()
 
-        button_quit = ctk.CTkButton(self.root, text="Quit", command=self.quit_application, corner_radius=32)
-        button_quit.pack(pady=10)
+        button_quit = ctk.CTkButton(mainframe, text="Quit", command=self.quit_application, corner_radius=32, font=("Helvetica", 20), width=250, height=40, text_color="white")
+        button_quit.pack(pady=(10, 50), padx=200)
     
     def open_dashboard(self):
         self.clear_window()
@@ -728,7 +712,7 @@ class LoginPanel:
         login_frame = ctk.CTkFrame(self.frame, corner_radius=32)
         login_frame.pack(padx=50, pady=30)
 
-        self.label_title = ctk.CTkLabel(login_frame, text="Login", font=("Helvetica", 40), text_color="#B22E2E", corner_radius=32)
+        self.label_title = ctk.CTkLabel(login_frame, text="Login", font=("Helvetica", 40, "bold"), text_color="#B22E2E", corner_radius=32)
         self.label_title.pack(pady=(30, 5))
 
         self.label_subtitle = ctk.CTkLabel(login_frame, text="Welcome Back! Please enter your details", font=("Helvetica", 15), text_color="grey50", corner_radius=32)
@@ -1016,7 +1000,7 @@ class RegisterPanel:
         registration_frame = ctk.CTkFrame(self.frame, corner_radius=32)
         registration_frame.pack(padx=50, pady=30)
 
-        self.label_register = ctk.CTkLabel(registration_frame, text="Register", font=("Helvetica", 40), text_color="#B22E2E", corner_radius=32)
+        self.label_register = ctk.CTkLabel(registration_frame, text="Register", font=("Helvetica", 40, "bold"), text_color="#B22E2E", corner_radius=32)
         self.label_register.pack(pady=(30, 5))
 
         self.label_subtitle = ctk.CTkLabel(registration_frame, text="Welcome! Please enter your details", font=("Helvetica", 15), text_color="grey50", corner_radius=32)
@@ -1103,7 +1087,7 @@ class RegisterPanel:
         self.checkbutton_terms_conditions.pack(side="left", pady=(0, 10), padx=(0, 0))
         self.checkbutton_terms_conditions.configure(state="disabled")
 
-        self.link_terms = ctk.CTkLabel(confirm_TandC_frame, text="Terms & Conditions", text_color="red", cursor="hand2")
+        self.link_terms = ctk.CTkLabel(confirm_TandC_frame, text="Terms & Conditions", text_color="red", cursor="hand2", font=("Helvetica", 12, "underline"))
         self.link_terms.pack(side="left", pady=(0, 10), padx=(0, 0))
         self.link_terms.bind("<Button-1>", self.create_TandC)
 
