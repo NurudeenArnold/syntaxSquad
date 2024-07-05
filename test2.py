@@ -801,7 +801,7 @@ class LoginPanel:
 
     def SignUpButton(self):
         self.hideLoginPanels()
-        self.showRegisterPanels()
+        root.after(1000, lambda: (self.showRegisterPanels()))
     
     def showRegisterPanels(self):
         self.master.register_panel.show_panel()
@@ -1143,7 +1143,7 @@ class RegisterPanel:
 
     def LogInButton(self):
         self.hideRegisterPanels()
-        self.showLoginPanels()
+        root.after(1000, lambda: (self.showLoginPanels()))
 
     def hideRegisterPanels(self):
         self.master.register_panel.hide_panel()
