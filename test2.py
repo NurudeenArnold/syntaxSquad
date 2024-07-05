@@ -43,7 +43,7 @@ class NexBank(ctk.CTk):
         screen_height = self.root.winfo_screenheight()
         x = (screen_width // 2) - (1200 // 2)
         y = (screen_height // 2) - (950 // 2)
-        self.root.geometry(f"1200x950+{x}+{y-50}")
+        self.root.geometry(f"1200x950+{x}+{y}")
 
         self.logged_in_user = None
         self.users = {}
@@ -119,6 +119,25 @@ class NexBank(ctk.CTk):
     def main_window(self):
         self.clear_window()
 
+        self.root.update_idletasks()  
+        width = self.root.winfo_width()
+        height = self.root.winfo_height()
+
+        image_path = "background.jpeg"
+        if not os.path.exists(image_path):
+            print("Image file not found!")
+        else:
+            background_image = Image.open(image_path)
+            background_image = background_image.resize((width, height), Image.LANCZOS)
+            self.background_image_tk = ImageTk.PhotoImage(background_image)
+
+            self.background_label = ctk.CTkLabel(self.root, image=self.background_image_tk, text="")
+            self.background_label.image = self.background_image_tk  
+            self.background_label.place(relx=0.5, rely=0.5, anchor="center")
+
+        mainframe = ctk.CTkFrame(self.root, corner_radius=32)
+        mainframe.pack(padx=50, pady=30)
+    
         label_main = ctk.CTkLabel(self.root, text="Welcome to NexBank!", font=("Verdana", 25), text_color="#B22E2E")
         label_main.pack(pady=50)
 
