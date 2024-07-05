@@ -184,11 +184,10 @@ class NexBank(ctk.CTk):
         self.root.pack_propagate(False)
 
     def logout(self):
-        self.dashboard_panel.hide_panel()
         self.login_panel.show_panel()
         self.welcome_panel.show_panel()
-        self.main_window()
         self.liftAll()
+        root.after(1000, lambda: (self.dashboard_panel.kill_panel(), self.main_window(), self.liftAll(), self.login_panel.hideLoginPanels()))
 
     def view_balance_comp(self):
         image = PhotoImage(file="nexbank2.png")
@@ -692,24 +691,24 @@ class NexBank(ctk.CTk):
         pass  
 
     def liftAll(self):
+        self.dashboard_panel.frame.lift()
         self.login_panel.frame.lift()
         self.welcome_panel.frame.lift()
         self.register_panel.frame.lift()
         self.register_welcome_panel.frame.lift()
-        self.dashboard_panel.frame.lift()
 
 class LoginPanel:
     def __init__(self, parent):
         self.master = parent
         self.root = parent.root
-        self.width = 0.45
+        self.width = 0.5
         self.start_pos = 1.0
         self.end_pos = 0.5
         self.pos = self.start_pos
         self.in_start_pos = True
 
         self.frame = ctk.CTkFrame(self.root)
-        self.frame.place(relx=self.start_pos, rely=0.05, relwidth=self.width, relheight=0.9)
+        self.frame.place(relx=self.start_pos, rely=0.015, relwidth=self.width, relheight=0.97)
 
         self.load_images()
         self.create_login_screen()
@@ -890,10 +889,9 @@ class LoginPanel:
         if email in self.master.users and self.master.users[email].password == password:
             self.master.logged_in_user = self.master.users[email]
             self.master.open_dashboard()
-            time.sleep(0.5)
-            self.hideLoginPanels()
-            self.entry_email.delete(0, 'end')
-            self.entry_password.delete(0, 'end')
+            self.master.liftAll()
+            root.after(1000, lambda: (self.hideLoginPanels(), self.entry_email.delete(0, 'end'), self.entry_password.delete(0, 'end')))
+            
         else:
             self.error_label.configure(text="Invalid email or password.")
 
@@ -913,7 +911,7 @@ class LoginPanel:
     def animate_forward(self):
         if self.pos > self.end_pos:
             self.pos -= 0.008
-            self.frame.place(relx=self.pos, rely=0.05, relwidth=self.width, relheight=0.9)
+            self.frame.place(relx=self.pos, rely=0.015, relwidth=self.width, relheight=0.97)
             self.frame.after(10, self.animate_forward)
         else:
             self.in_start_pos = False
@@ -921,7 +919,7 @@ class LoginPanel:
     def animate_backwards(self):
         if self.pos < self.start_pos:
             self.pos += 0.008
-            self.frame.place(relx=self.pos, rely=0.05, relwidth=self.width, relheight=0.9)
+            self.frame.place(relx=self.pos, rely=0.015, relwidth=self.width, relheight=0.97)
             self.frame.after(10, self.animate_backwards)
         else:
             self.in_start_pos = True
@@ -934,14 +932,14 @@ class WelcomePanel:
     def __init__(self, parent):
         self.master = parent
         self.root = parent.root
-        self.width = 0.45
-        self.start_pos = -0.45
-        self.end_pos = 0.05
+        self.width = 0.5
+        self.start_pos = -0.5
+        self.end_pos = 0.00
         self.pos = self.start_pos
         self.in_start_pos = True
 
         self.frame = ctk.CTkFrame(self.root)
-        self.frame.place(relx=self.start_pos, rely=0.05, relwidth=self.width, relheight=0.9)
+        self.frame.place(relx=self.start_pos, rely=0.015, relwidth=self.width, relheight=0.97)
 
         self.create_welcome_message()
 
@@ -977,7 +975,7 @@ class WelcomePanel:
     def animate_forward(self):
         if self.pos < self.end_pos:
             self.pos += 0.008
-            self.frame.place(relx=self.pos, rely=0.05, relwidth=self.width, relheight=0.9)
+            self.frame.place(relx=self.pos, rely=0.015, relwidth=self.width, relheight=0.97)
             self.frame.after(10, self.animate_forward)
         else:
             self.in_start_pos = False
@@ -985,7 +983,7 @@ class WelcomePanel:
     def animate_backwards(self):
         if self.pos > self.start_pos:
             self.pos -= 0.008
-            self.frame.place(relx=self.pos, rely=0.05, relwidth=self.width, relheight=0.9)
+            self.frame.place(relx=self.pos, rely=0.015, relwidth=self.width, relheight=0.97)
             self.frame.after(10, self.animate_backwards)
         else:
             self.in_start_pos = True
@@ -995,14 +993,14 @@ class RegisterPanel:
     def __init__(self, parent):
         self.master = parent
         self.root = parent.root
-        self.width = 0.45
-        self.start_pos = -0.45
-        self.end_pos = 0.05
+        self.width = 0.5
+        self.start_pos = -0.5
+        self.end_pos = 0.00
         self.pos = self.start_pos
         self.in_start_pos = True
 
         self.frame = ctk.CTkFrame(self.root)
-        self.frame.place(relx=self.start_pos, rely=0.05, relwidth=self.width, relheight=0.9)
+        self.frame.place(relx=self.start_pos, rely=0.015, relwidth=self.width, relheight=0.97)
 
         self.load_images()
         self.create_registration_form()
@@ -1412,23 +1410,23 @@ class RegisterPanel:
         if direction == "forward" and self.in_start_pos:
             self.animate_forward()
         elif direction == "backward" and not self.in_start_pos:
-            self.animate_backward()
+            self.animate_backwards()
 
     def animate_forward(self):
-        self.pos += 0.008
-        self.frame.place(relx=self.pos)
-        if self.pos >= self.end_pos:
-            self.in_start_pos = False
-        else:
+        if self.pos < self.end_pos:
+            self.pos += 0.008
+            self.frame.place(relx=self.pos, rely=0.015, relwidth=self.width, relheight=0.97)
             self.frame.after(10, self.animate_forward)
-
-    def animate_backward(self):
-        self.pos -= 0.008
-        self.frame.place(relx=self.pos)
-        if self.pos <= self.start_pos:
-            self.in_start_pos = True
         else:
-            self.frame.after(10, self.animate_backward)
+            self.in_start_pos = False
+
+    def animate_backwards(self):
+        if self.pos > self.start_pos:
+            self.pos -= 0.008
+            self.frame.place(relx=self.pos, rely=0.015, relwidth=self.width, relheight=0.97)
+            self.frame.after(10, self.animate_backwards)
+        else:
+            self.in_start_pos = True
 
     def hide_panel(self):
         self.animate("backward")
@@ -1445,14 +1443,14 @@ class RegisterWelcomePanel:
     def __init__(self, parent):
         self.master = parent
         self.root = parent.root
-        self.width = 0.45
+        self.width = 0.5
         self.start_pos = 1.0  
         self.end_pos = 0.5
         self.pos = self.start_pos
         self.in_start_pos = True
 
         self.frame = ctk.CTkFrame(self.root)
-        self.frame.place(relx=self.start_pos, rely=0.05, relwidth=self.width, relheight=0.9)
+        self.frame.place(relx=self.start_pos, rely=0.015, relwidth=self.width, relheight=0.97)
 
         self.create_welcome_message()
 
@@ -1482,7 +1480,7 @@ class RegisterWelcomePanel:
     def animate_forward(self):
         if self.pos > self.end_pos:
             self.pos -= 0.008
-            self.frame.place(relx=self.pos, rely=0.05, relwidth=self.width, relheight=0.9)
+            self.frame.place(relx=self.pos, rely=0.015, relwidth=self.width, relheight=0.97)
             self.frame.after(10, self.animate_forward)
         else:
             self.in_start_pos = False
@@ -1490,7 +1488,7 @@ class RegisterWelcomePanel:
     def animate_backwards(self):
         if self.pos < self.start_pos:
             self.pos += 0.008
-            self.frame.place(relx=self.pos, rely=0.05, relwidth=self.width, relheight=0.9)
+            self.frame.place(relx=self.pos, rely=0.015, relwidth=self.width, relheight=0.97)
             self.frame.after(10, self.animate_backwards)
         else:
             self.in_start_pos = True
@@ -1547,6 +1545,10 @@ class CenteredPanel:
     
     def show_panel(self):
         self.animate("forward")
+
+    def kill_panel(self):
+        self.pos = self.start_pos
+        self.frame.place_forget()
 
 if __name__ == "__main__":
     root = tk.Tk()
