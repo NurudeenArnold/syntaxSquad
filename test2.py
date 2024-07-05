@@ -37,9 +37,13 @@ class User:
 class NexBank(ctk.CTk):
     def __init__(self, root):
         self.root = root
-        self.root.title("NexBank")  
-        self.root.geometry("1000x800")  
-        self.root.resizable(False, False) 
+        self.root.title("NexBank")
+        self.root.geometry("1200x950")
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        x = (screen_width // 2) - (1200 // 2)
+        y = (screen_height // 2) - (950 // 2)
+        self.root.geometry(f"1200x950+{x}+{y-50}")
 
         self.logged_in_user = None
         self.users = {}
@@ -703,7 +707,7 @@ class LoginPanel:
 
     def create_login_screen(self):
         login_frame = ctk.CTkFrame(self.frame, corner_radius=32)
-        login_frame.pack(padx=10, pady=30)
+        login_frame.pack(padx=50, pady=30)
 
         self.label_title = ctk.CTkLabel(login_frame, text="Login", font=("Helvetica", 40), text_color="#B22E2E", corner_radius=32)
         self.label_title.pack(pady=(30, 5))
@@ -767,13 +771,13 @@ class LoginPanel:
                                                     fg_color="transparent", 
                                                     text_color="grey50",
                                                     font=("Helvetica", 12))
-        self.button_forgot_password.pack(padx=(100, 0), side="left")
+        self.button_forgot_password.pack(padx=(60, 0), side="left")
 
         self.button_forgot_password = ctk.CTkButton(register_frame, text="Sign up", command=self.SignUpButton,
                                                     fg_color="transparent", 
                                                     hover_color="white", text_color="red",
                                                     font=("Helvetica", 12, "underline"))
-        self.button_forgot_password.pack(padx=(0, 100), side="left")
+        self.button_forgot_password.pack(padx=(0, 60), side="left")
 
     def SignUpButton(self):
         self.hideLoginPanels()
@@ -924,7 +928,7 @@ class WelcomePanel:
         width = self.frame.winfo_width()
         height = self.frame.winfo_height()
 
-        image_path = "background1.jpg"
+        image_path = "background.jpeg"
         if not os.path.exists(image_path):
             print("Image file not found!")
         else:
@@ -990,11 +994,14 @@ class RegisterPanel:
         self.imgHide = ImageTk.PhotoImage(Image.open("eyeslash.png").resize((20, 20), Image.LANCZOS))
 
     def create_registration_form(self):
-        self.label_register = ctk.CTkLabel(self.frame, text="Register", font=("Helvetica", 25), text_color="#B22E2E", corner_radius=32)
-        self.label_register.pack(pady=10)
-
         registration_frame = ctk.CTkFrame(self.frame, corner_radius=32)
         registration_frame.pack(padx=10, pady=10)
+
+        self.label_register = ctk.CTkLabel(registration_frame, text="Register", font=("Helvetica", 40), text_color="#B22E2E", corner_radius=32)
+        self.label_register.pack(pady=10)
+
+        self.label_subtitle = ctk.CTkLabel(registration_frame, text="Welcome! Please enter your details", font=("Helvetica", 15), text_color="grey50", corner_radius=32)
+        self.label_subtitle.pack(pady=(5, 10))
 
         self.label_DOB = ctk.CTkLabel(registration_frame, text="DOB (DD/MM/YYYY):")
         self.label_DOB.pack()
@@ -1394,7 +1401,7 @@ class RegisterWelcomePanel:
         width = self.frame.winfo_width()
         height = self.frame.winfo_height()
 
-        image_path = "background2.jpg"
+        image_path = "background.jpeg"
         if not os.path.exists(image_path):
             print("Image file not found!")
         else:
