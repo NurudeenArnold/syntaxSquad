@@ -47,6 +47,7 @@ class NexBank(ctk.CTk):
         self.logged_in_user = None
         self.users = {}
         self.current_frame = None
+        self.registeredEmail = None
 
         self.load_users()
         
@@ -727,7 +728,7 @@ class LoginPanel:
 
     def create_login_screen(self):
         login_frame = ctk.CTkFrame(self.frame, corner_radius=32)
-        login_frame.pack(padx=50, pady=30)
+        login_frame.pack(padx=50, pady=(230))
 
         self.label_title = ctk.CTkLabel(login_frame, text="Login", font=("Helvetica", 40, "bold"), text_color="#B22E2E", corner_radius=32)
         self.label_title.pack(pady=(30, 5))
@@ -1015,7 +1016,7 @@ class RegisterPanel:
 
     def create_registration_form(self):
         registration_frame = ctk.CTkFrame(self.frame, corner_radius=32)
-        registration_frame.pack(padx=50, pady=30)
+        registration_frame.pack(padx=50, pady=65)
 
         self.label_register = ctk.CTkLabel(registration_frame, text="Register", font=("Helvetica", 40, "bold"), text_color="#B22E2E", corner_radius=32)
         self.label_register.pack(pady=(30, 5))
@@ -1368,33 +1369,20 @@ class RegisterPanel:
         if not self.var_terms_conditions.get():
             self.handle_error("Terms & Conditions is required to be accepted.")
             return
-
+        
+        self.master.registeredEmail = email
         balance = 500.0
         account_number = self.generate_account_number()
         new_user = User(email, password, account_number, contact, dob, balance)
         self.master.users[email] = new_user
         self.master.save_users()
         self.send_registration_email(email, password)
-        self.create_popup("Register Successful",
-                        "Please check your email for your credentials. \nYou will be able to login now.")
         self.hide_panel()
         self.master.register_welcome_panel.hide_panel()
         time.sleep(1) 
+        self.master.login_panel.entry_email.insert(0, self.master.registeredEmail)
         self.master.login_panel.show_panel()
         self.master.welcome_panel.show_panel()
-
-    def create_popup(self, title, message, text_color="black", page=""):
-        popup = ctk.CTkFrame(self.root)
-        popup.pack(padx=20, pady=20)
-
-        label_title = ctk.CTkLabel(popup, text=title, font=("Helvetica", 25), text_color="red")
-        label_title.pack(pady=10, padx=30)
-
-        label_message = ctk.CTkLabel(popup, text=message, font=("Helvetica", 12), text_color=text_color)
-        label_message.pack(pady=10, padx=30)
-
-        button_ok = ctk.CTkButton(popup, text="OK", command=page, corner_radius=32)
-        button_ok.pack(pady=10, padx=100)
 
     def start_register_thread(self):
         self.button_register.configure(text="Registering\nPlease Wait...")
