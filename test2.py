@@ -24,12 +24,13 @@ ctk.set_appearance_mode("Light")
 ctk.set_default_color_theme("themes/red.json")
 
 class User:
-    def __init__(self, email, password, account_number, contact, dob, balance):
+    def __init__(self, email, password, account_number, contact, dob, ID, balance):
         self.email = email
         self.password = password
         self.account_number = account_number
         self.contact = contact
         self.dob = dob
+        self.ID = ID
         self.balance = float(balance)
         self.transactions = []
 
@@ -71,15 +72,15 @@ class NexBank(ctk.CTk):
             with open("UserData.txt", "r") as file:
                 for line in file:
                     data = line.strip().split(",")
-                    if len(data) == 6:
-                        email, password, account_number, contact, dob, balance = data
-                        print(f"Loading user: {email}, {password}, {account_number}, {contact}, {dob}, {balance}")
-                        self.users[email] = User(email, password, account_number, contact, dob, balance)
+                    if len(data) == 7:
+                        email, password, account_number, contact, dob, ID, balance = data
+                        print(f"Loading user: {email}, {password}, {account_number}, {contact}, {dob}, {ID}, {balance}")
+                        self.users[email] = User(email, password, account_number, contact, dob, ID, balance)
                         self.users[email].balance = float(balance)
-                    elif len(data) == 5:
-                        email, password, account_number, contact, dob, balance = data
-                        print(f"Loading user: {email}, {password}, {account_number}, {contact}, {dob}, {balance}")
-                        self.users[email] = User(email, password, account_number, contact, dob, balance)
+                    elif len(data) == 6:
+                        email, password, account_number, contact, dob, ID, balance = data
+                        print(f"Loading user: {email}, {password}, {account_number}, {contact}, {dob}, {ID}, {balance}")
+                        self.users[email] = User(email, password, account_number, contact, dob, ID, balance)
                     else:
                         print(f"Skipping invalid line: {line}")
                     self.load_transaction_history(email)
@@ -93,7 +94,7 @@ class NexBank(ctk.CTk):
         try:
             with open("UserData.txt", "w") as file:
                 for user in self.users.values():
-                    file.write(f"{user.email},{user.password},{user.account_number},{user.contact},{user.dob},{user.balance}\n")
+                    file.write(f"{user.email},{user.password},{user.account_number},{user.contact},{user.dob}, {user.ID},{user.balance}\n")
         except Exception as e:
             print(f"Error saving users: {e}")
 
@@ -423,10 +424,11 @@ class NexBank(ctk.CTk):
         c.drawImage(logo_path, 50, 650, width=100, height=100)
 
         c.setFont("Helvetica", 12)
-        c.drawString(350, 730, "Account Number: " + self.logged_in_user.account_number)
-        c.drawString(350, 715, "DOB (DD/MM/YYYY): " + self.logged_in_user.dob)
-        c.drawString(350, 700, "Contact Number: " + self.logged_in_user.contact)
-        c.drawString(350, 685, "Email: " + self.logged_in_user.email)
+        c.drawString(350, 715, "ID Number: " + self.logged_in_user.ID)
+        c.drawString(350, 700, "Account Number: " + self.logged_in_user.account_number)
+        c.drawString(350, 685, "DOB (DD/MM/YYYY): " + self.logged_in_user.dob)
+        c.drawString(350, 670, "Contact Number: " + self.logged_in_user.contact)
+        c.drawString(350, 655, "Email: " + self.logged_in_user.email)
 
         c.setFont("Helvetica-Bold", 16)
         c.drawString(50, 600, "Transaction History")
@@ -521,10 +523,11 @@ class NexBank(ctk.CTk):
         c.drawImage(logo_path, 50, 650, width=100, height=100)
 
         c.setFont("Helvetica", 12)
-        c.drawString(350, 730, "Account Number: " + self.logged_in_user.account_number)
-        c.drawString(350, 715, "DOB (DD/MM/YYYY): " + self.logged_in_user.dob)
-        c.drawString(350, 700, "Contact Number: " + self.logged_in_user.contact)
-        c.drawString(350, 685, "Email: " + self.logged_in_user.email)
+        c.drawString(350, 715, "ID Number: " + self.logged_in_user.ID)
+        c.drawString(350, 700, "Account Number: " + self.logged_in_user.account_number)
+        c.drawString(350, 685, "DOB (DD/MM/YYYY): " + self.logged_in_user.dob)
+        c.drawString(350, 670, "Contact Number: " + self.logged_in_user.contact)
+        c.drawString(350, 655, "Email: " + self.logged_in_user.email)
 
         c.setFont("Helvetica-Bold", 16)
         c.drawString(50, 600, "Transaction History")
@@ -645,6 +648,9 @@ class NexBank(ctk.CTk):
 
         details_frame = ctk.CTkFrame(self.dashboard_panel.frame)
         details_frame.pack(padx=10, pady=10)
+
+        label_ID = ctk.CTkLabel(details_frame, text=f"ID Number: {self.logged_in_user.ID}")
+        label_ID.pack()
 
         label_email = ctk.CTkLabel(details_frame, text=f"Email: {self.logged_in_user.email}")
         label_email.pack()
@@ -1311,10 +1317,19 @@ class RegisterPanel:
         confirmPassword = self.entry_confirmPassword.get()
         password = self.entry_password.get()
         email = self.entry_email.get().strip().lower()
+        ID = self.entry_ID.get().strip()
 
         # Validation checks
-        if not (dob and contact and email and password and confirmPassword):
+        if not (ID and dob and contact and email and password and confirmPassword):
             self.handle_error("Please fill in all fields")
+            return
+        
+        if not ID.isdigit():
+            self.handle_error("Please enter a valid ID Number")
+            return
+
+        if len(ID) != 13:
+            self.handle_error("Please enter a 13-digit ID Number")
             return
 
         if not re.match(r'\d{2}/\d{2}/\d{4}', dob):
@@ -1347,6 +1362,9 @@ class RegisterPanel:
             return
 
         for user in self.master.users.values():
+            if user.ID == ID:
+                self.handle_error("There is already an account with this ID Number.")
+                return
             if user.email == email:
                 self.handle_error("Email already registered. Please try a different email.")
                 return
@@ -1373,7 +1391,7 @@ class RegisterPanel:
         self.master.registeredEmail = email
         balance = 500.0
         account_number = self.generate_account_number()
-        new_user = User(email, password, account_number, contact, dob, balance)
+        new_user = User(email, password, account_number, contact, dob, ID, balance)
         self.master.users[email] = new_user
         self.master.save_users()
         self.send_registration_email(email, password)
