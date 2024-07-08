@@ -1,5 +1,5 @@
 # syntaxSquadNexBankBankingApp
-This is an improved banking app created by the SyntaxSquad. <br>
+This is an improved banking app created by the syntaxSquad. <br>
 ### We are:
 Alex Almacin<br>
 Ammaarah Fakier <br>
