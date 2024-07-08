@@ -43,7 +43,7 @@ class NexBank(ctk.CTk):
         screen_height = self.root.winfo_screenheight()
         x = (screen_width // 2) - (1200 // 2)
         y = (screen_height // 2) - (850 // 2)
-        self.root.geometry(f"1200x850+{x}+{y - 40}")
+        self.root.geometry(f"1200x850+{x}+{y -30}")
 
         self.logged_in_user = None
         self.users = {}
@@ -134,13 +134,13 @@ class NexBank(ctk.CTk):
         image_label.image = img
         image_label.pack(pady=20)
 
-        button_login = ctk.CTkButton(mainframe, text="Login", command=self.show_login_and_welcome, corner_radius=32, font=("Helvetica", 20), width=250, height=25, text_color="white")
+        button_login = ctk.CTkButton(mainframe, text="Login", command=self.show_login_and_welcome, corner_radius=32, font=("Helvetica", 15), width=250, height=25, text_color="white")
         button_login.pack(pady=10)
 
-        button_register = ctk.CTkButton(mainframe, text="Register", command=self.open_registration_window, corner_radius=32, font=("Helvetica", 20), width=250, height=25, text_color="white")
+        button_register = ctk.CTkButton(mainframe, text="Register", command=self.open_registration_window, corner_radius=32, font=("Helvetica", 15), width=250, height=25, text_color="white")
         button_register.pack()
 
-        button_quit = ctk.CTkButton(mainframe, text="Quit", command=self.quit_application, corner_radius=32, font=("Helvetica", 20), width=250, height=25, text_color="white")
+        button_quit = ctk.CTkButton(mainframe, text="Quit", command=self.quit_application, corner_radius=32, font=("Helvetica", 15), width=250, height=25, text_color="white")
         button_quit.pack(pady=(10, 50), padx=200)
     
     def open_dashboard(self):
@@ -175,13 +175,13 @@ class NexBank(ctk.CTk):
             option_button = ctk.CTkButton(panel_menu_frame, text=option[0], command=option[1],
                                         corner_radius=32, height=60, fg_color="transparent",
                                         font=("Helvetica", 15, "bold"), image=option_icon)
-            option_button.pack(fill="x", padx=(20, 10), pady=(30))
+            option_button.pack(fill="x", padx=(20, 10), pady=(15))
 
         logout_icon = PhotoImage(file="logout.png").subsample(1)
         logout_button = ctk.CTkButton(panel_menu_frame, text="Logout", command=self.logout,
                                     corner_radius=32, height=60, fg_color="transparent",
                                     font=("Helvetica", 15, "bold"), image=logout_icon)
-        logout_button.pack(side="bottom", fill="x", padx=20, pady=(30))
+        logout_button.pack(side="bottom", fill="x", padx=20, pady=(15))
 
         self.root.pack_propagate(False)
 
@@ -199,7 +199,7 @@ class NexBank(ctk.CTk):
         self.image_label.pack(pady=20)
 
         label_balance = ctk.CTkLabel(self.dashboard_panel.frame, text=f"Your Balance: R{self.logged_in_user.balance:.2f}",
-                                                font=("Helvetica", 20))
+                                                font=("Helvetica", 15))
         label_balance.pack(pady=20)
 
         button_back = ctk.CTkButton(self.dashboard_panel.frame, text="Back", command=self.backDashboard, corner_radius=32)
@@ -785,10 +785,10 @@ class LoginPanel:
         self.error_label = ctk.CTkLabel(login_frame, text="", text_color="red")
         self.error_label.pack(padx=5)
 
-        self.button_login = ctk.CTkButton(login_frame, text="Login", command=self.login_user, corner_radius=32, font=("Helvetica", 20), width=250, height=25, text_color="white")
+        self.button_login = ctk.CTkButton(login_frame, text="Login", command=self.login_user, corner_radius=32, font=("Helvetica", 15), width=250, height=25, text_color="white")
         self.button_login.pack(pady=(0, 10))
 
-        self.button_back = ctk.CTkButton(login_frame, text="Back", command=self.hideLoginPanels, corner_radius=32, font=("Helvetica", 20), width=250, height=25, text_color="white")
+        self.button_back = ctk.CTkButton(login_frame, text="Back", command=self.hideLoginPanels, corner_radius=32, font=("Helvetica", 15), width=250, height=25, text_color="white")
         self.button_back.pack(pady=(0, 30))
 
         register_frame = ctk.CTkFrame(login_frame, fg_color="transparent")
@@ -1127,10 +1127,10 @@ class RegisterPanel:
         self.link_terms.pack(side="left", pady=(0, 10), padx=(0, 0))
         self.link_terms.bind("<Button-1>", self.create_TandC)
 
-        self.button_register = ctk.CTkButton(registration_frame, text="Register", command=self.start_register_thread, corner_radius=32, font=("Helvetica", 20), width=250, height=25, text_color="white")
+        self.button_register = ctk.CTkButton(registration_frame, text="Register", command=self.start_register_thread, corner_radius=32, font=("Helvetica", 15), width=250, height=25, text_color="white")
         self.button_register.pack(pady=(0, 10))
 
-        self.button_back = ctk.CTkButton(registration_frame, text="Back", command=self.hideRegisterPanels, corner_radius=32, font=("Helvetica", 20), width=250, height=25, text_color="white")
+        self.button_back = ctk.CTkButton(registration_frame, text="Back", command=self.hideRegisterPanels, corner_radius=32, font=("Helvetica", 15), width=250, height=25, text_color="white")
         self.button_back.pack(pady=(0, 30))
 
         signup_frame = ctk.CTkFrame(registration_frame, fg_color="transparent")
@@ -1403,7 +1403,7 @@ class RegisterPanel:
         self.master.welcome_panel.show_panel()
 
     def start_register_thread(self):
-        self.button_register.configure(text="Registering\nPlease Wait...")
+        self.button_register.configure(text="Please Wait...")
         register_thread = threading.Thread(target=self.register_user)
         register_thread.start() 
         pass
