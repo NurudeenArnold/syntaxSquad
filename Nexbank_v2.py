@@ -955,7 +955,7 @@ class WelcomePanel:
         width = self.frame.winfo_width()
         height = self.frame.winfo_height()
 
-        image_path = "background.jpeg"
+        image_path = "dotted2.png"
         if not os.path.exists(image_path):
             print("Image file not found!")
         else:
@@ -1465,7 +1465,7 @@ class RegisterWelcomePanel:
         width = self.frame.winfo_width()
         height = self.frame.winfo_height()
 
-        image_path = "background.jpeg"
+        image_path = "dotted2.png"
         if not os.path.exists(image_path):
             print("Image file not found!")
         else:
