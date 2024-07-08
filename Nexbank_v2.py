@@ -42,8 +42,8 @@ class NexBank(ctk.CTk):
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
         x = (screen_width // 2) - (1200 // 2)
-        y = (screen_height // 2) - (1000 // 2)
-        self.root.geometry(f"1200x1000+{x}+{y - 40}")
+        y = (screen_height // 2) - (850 // 2)
+        self.root.geometry(f"1200x850+{x}+{y - 40}")
 
         self.logged_in_user = None
         self.users = {}
@@ -134,13 +134,13 @@ class NexBank(ctk.CTk):
         image_label.image = img
         image_label.pack(pady=20)
 
-        button_login = ctk.CTkButton(mainframe, text="Login", command=self.show_login_and_welcome, corner_radius=32, font=("Helvetica", 20), width=250, height=40, text_color="white")
+        button_login = ctk.CTkButton(mainframe, text="Login", command=self.show_login_and_welcome, corner_radius=32, font=("Helvetica", 20), width=250, height=25, text_color="white")
         button_login.pack(pady=10)
 
-        button_register = ctk.CTkButton(mainframe, text="Register", command=self.open_registration_window, corner_radius=32, font=("Helvetica", 20), width=250, height=40, text_color="white")
+        button_register = ctk.CTkButton(mainframe, text="Register", command=self.open_registration_window, corner_radius=32, font=("Helvetica", 20), width=250, height=25, text_color="white")
         button_register.pack()
 
-        button_quit = ctk.CTkButton(mainframe, text="Quit", command=self.quit_application, corner_radius=32, font=("Helvetica", 20), width=250, height=40, text_color="white")
+        button_quit = ctk.CTkButton(mainframe, text="Quit", command=self.quit_application, corner_radius=32, font=("Helvetica", 20), width=250, height=25, text_color="white")
         button_quit.pack(pady=(10, 50), padx=200)
     
     def open_dashboard(self):
@@ -734,7 +734,7 @@ class LoginPanel:
 
     def create_login_screen(self):
         login_frame = ctk.CTkFrame(self.frame, corner_radius=32)
-        login_frame.pack(padx=50, pady=(230))
+        login_frame.pack(padx=50, pady=(150))
 
         self.label_title = ctk.CTkLabel(login_frame, text="Login", font=("Helvetica", 40, "bold"), text_color="#B22E2E", corner_radius=32)
         self.label_title.pack(pady=(30, 5))
@@ -753,7 +753,7 @@ class LoginPanel:
                                                     fg_color="transparent", bg_color="transparent", hover=False)
         self.email_visibility_button.pack(side="left", padx=(0, 0))
 
-        self.entry_email = ctk.CTkEntry(email_frame, width=250, height=40, font=("Helvetica", 15))
+        self.entry_email = ctk.CTkEntry(email_frame, width=250, height=25, font=("Helvetica", 15))
         self.entry_email.pack(side="left", padx=(0, 42))
 
         self.label_password = ctk.CTkLabel(login_frame, text="Password:")
@@ -767,7 +767,7 @@ class LoginPanel:
                                             bg_color="transparent", hover=False)
         self.password_button.pack(side="left", padx=(0, 0))
 
-        self.entry_password = ctk.CTkEntry(password_frame, show="*", width=250, height=40, font=("Helvetica", 15))
+        self.entry_password = ctk.CTkEntry(password_frame, show="*", width=250, height=25, font=("Helvetica", 15))
         self.entry_password.pack(side="left", padx=(0, 0))
 
         self.password_visibility_button = ctk.CTkButton(password_frame, image=self.imgShow,
@@ -785,10 +785,10 @@ class LoginPanel:
         self.error_label = ctk.CTkLabel(login_frame, text="", text_color="red")
         self.error_label.pack(padx=5)
 
-        self.button_login = ctk.CTkButton(login_frame, text="Login", command=self.login_user, corner_radius=32, font=("Helvetica", 20), width=250, height=40, text_color="white")
+        self.button_login = ctk.CTkButton(login_frame, text="Login", command=self.login_user, corner_radius=32, font=("Helvetica", 20), width=250, height=25, text_color="white")
         self.button_login.pack(pady=(0, 10))
 
-        self.button_back = ctk.CTkButton(login_frame, text="Back", command=self.hideLoginPanels, corner_radius=32, font=("Helvetica", 20), width=250, height=40, text_color="white")
+        self.button_back = ctk.CTkButton(login_frame, text="Back", command=self.hideLoginPanels, corner_radius=32, font=("Helvetica", 20), width=250, height=25, text_color="white")
         self.button_back.pack(pady=(0, 30))
 
         register_frame = ctk.CTkFrame(login_frame, fg_color="transparent")
@@ -1022,7 +1022,7 @@ class RegisterPanel:
 
     def create_registration_form(self):
         registration_frame = ctk.CTkFrame(self.frame, corner_radius=32)
-        registration_frame.pack(padx=50, pady=65)
+        registration_frame.pack(padx=50, pady=50)
 
         self.label_register = ctk.CTkLabel(registration_frame, text="Register", font=("Helvetica", 40, "bold"), text_color="#B22E2E", corner_radius=32)
         self.label_register.pack(pady=(30, 5))
@@ -1039,7 +1039,7 @@ class RegisterPanel:
         self.ID_visibility_button = ctk.CTkButton(ID_frame, image=self.imgUser, text="", width=20, height=20, fg_color="transparent", bg_color="transparent", hover=False)
         self.ID_visibility_button.pack(side="left", padx=(0, 0))
 
-        self.entry_ID = ctk.CTkEntry(ID_frame, width=250, height=40, font=("Helvetica", 15))
+        self.entry_ID = ctk.CTkEntry(ID_frame, width=250, height=25, font=("Helvetica", 15))
         self.entry_ID.pack(side="left", padx=(0, 42))
 
         self.label_DOB = ctk.CTkLabel(registration_frame, text="DOB (DD/MM/YYYY):")
@@ -1051,7 +1051,7 @@ class RegisterPanel:
         self.DOB_visibility_button = ctk.CTkButton(DOB_frame, image=self.imgUser, text="", width=20, height=20, fg_color="transparent", bg_color="transparent", hover=False)
         self.DOB_visibility_button.pack(side="left", padx=(0, 0))
 
-        self.entry_DOB = ctk.CTkEntry(DOB_frame, width=250, height=40, font=("Helvetica", 15))
+        self.entry_DOB = ctk.CTkEntry(DOB_frame, width=250, height=25, font=("Helvetica", 15))
         self.entry_DOB.pack(side="left", padx=(0, 42))
 
         self.label_contact = ctk.CTkLabel(registration_frame, text="Contact Number:")
@@ -1063,7 +1063,7 @@ class RegisterPanel:
         self.contact_visibility_button = ctk.CTkButton(contact_frame, image=self.imgPhone, text="", width=20, height=20, fg_color="transparent", bg_color="transparent", hover=False)
         self.contact_visibility_button.pack(side="left", padx=(0, 0))
 
-        self.entry_contact = ctk.CTkEntry(contact_frame, width=250, height=40, font=("Helvetica", 15))
+        self.entry_contact = ctk.CTkEntry(contact_frame, width=250, height=25, font=("Helvetica", 15))
         self.entry_contact.pack(side="left", padx=(0, 42))
 
         self.label_email = ctk.CTkLabel(registration_frame, text="Email:")
@@ -1075,7 +1075,7 @@ class RegisterPanel:
         self.email_visibility_button = ctk.CTkButton(email_frame, image=self.imgEmail, text="", width=20, height=20, fg_color="transparent", bg_color="transparent", hover=False)
         self.email_visibility_button.pack(side="left", padx=(0, 0))
 
-        self.entry_email = ctk.CTkEntry(email_frame, width=250, height=40, font=("Helvetica", 15))
+        self.entry_email = ctk.CTkEntry(email_frame, width=250, height=25, font=("Helvetica", 15))
         self.entry_email.pack(side="left", padx=(0, 42))
 
         self.label_password = ctk.CTkLabel(registration_frame, text="Password:")
@@ -1087,7 +1087,7 @@ class RegisterPanel:
         self.password_button = ctk.CTkButton(password_frame, image=self.imgPassword, command=self.toggle_password_visibility, text="", width=20, height=20, fg_color="transparent", bg_color="transparent", hover=False)
         self.password_button.pack(side="left", padx=(0, 0))
 
-        self.entry_password = ctk.CTkEntry(password_frame, show="*", width=250, height=40, font=("Helvetica", 15))
+        self.entry_password = ctk.CTkEntry(password_frame, show="*", width=250, height=25, font=("Helvetica", 15))
         self.entry_password.pack(side="left", padx=(0, 0))
 
         self.password_visibility_button = ctk.CTkButton(password_frame, image=self.imgShow, command=self.toggle_password_visibility, text="", width=20, height=20, fg_color="transparent", bg_color="transparent", hover=False)
@@ -1102,7 +1102,7 @@ class RegisterPanel:
         self.confirm_password_visibility_button = ctk.CTkButton(confirm_password_frame, image=self.imgPassword, text="", width=20, height=20, fg_color="transparent", bg_color="transparent", hover=False)
         self.confirm_password_visibility_button.pack(side="left", padx=(0, 0))
 
-        self.entry_confirmPassword = ctk.CTkEntry(confirm_password_frame, show="*", width=250, height=40, font=("Helvetica", 15))
+        self.entry_confirmPassword = ctk.CTkEntry(confirm_password_frame, show="*", width=250, height=25, font=("Helvetica", 15))
         self.entry_confirmPassword.pack(side="left", padx=(0, 0))
 
         self.confirm_password_visibility_button2 = ctk.CTkButton(confirm_password_frame, image=self.imgShow, command=self.toggle_password_visibility2, text="", width=20, height=20, fg_color="transparent", bg_color="transparent", hover=False)
@@ -1127,10 +1127,10 @@ class RegisterPanel:
         self.link_terms.pack(side="left", pady=(0, 10), padx=(0, 0))
         self.link_terms.bind("<Button-1>", self.create_TandC)
 
-        self.button_register = ctk.CTkButton(registration_frame, text="Register", command=self.start_register_thread, corner_radius=32, font=("Helvetica", 20), width=250, height=40, text_color="white")
+        self.button_register = ctk.CTkButton(registration_frame, text="Register", command=self.start_register_thread, corner_radius=32, font=("Helvetica", 20), width=250, height=25, text_color="white")
         self.button_register.pack(pady=(0, 10))
 
-        self.button_back = ctk.CTkButton(registration_frame, text="Back", command=self.hideRegisterPanels, corner_radius=32, font=("Helvetica", 20), width=250, height=40, text_color="white")
+        self.button_back = ctk.CTkButton(registration_frame, text="Back", command=self.hideRegisterPanels, corner_radius=32, font=("Helvetica", 20), width=250, height=25, text_color="white")
         self.button_back.pack(pady=(0, 30))
 
         signup_frame = ctk.CTkFrame(registration_frame, fg_color="transparent")
