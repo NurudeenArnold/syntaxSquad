@@ -146,8 +146,8 @@ class NexBank(ctk.CTk):
     def open_dashboard(self):
         self.clear_window()
 
-        logo_image = PhotoImage(file="nexbank2.png")
-        resized_logo = logo_image.subsample(3, 3)
+        logo_image = PhotoImage(file="inverted_logo.png")
+        resized_logo = logo_image.subsample(2, 2)
 
         panel_menu_frame = ctk.CTkFrame(self.root, fg_color="#B22E2E", width=100, corner_radius=32)
         panel_menu_frame.pack(side="left", fill="y", padx=(20, 10), pady=(28))
