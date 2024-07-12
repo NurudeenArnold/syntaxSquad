@@ -65,8 +65,8 @@ class NexBank(ctk.CTk):
         self.register_welcome_panel.hide_panel()
         self.dashboard_panel.hide_panel()
 
-        self.main_window()
-        #self.open_dashboard() #TEST ?////////////////////////////////////////////////////////////////////////
+        #self.main_window()
+        self.open_dashboard() #TEST ?////////////////////////////////////////////////////////////////////////
 
     def load_users(self):
         try:
@@ -179,12 +179,14 @@ class NexBank(ctk.CTk):
             option_button.pack(fill="x", padx=(20, 10), pady=(15))
 
         logout_icon = PhotoImage(file="logout.png").subsample(1)
-        logout_button = ctk.CTkButton(panel_menu_frame, text="Logout", command=self.logout,
+        logout_button = ctk.CTkButton(panel_menu_frame, text="Logout", command=self.logout_quesiton,
                                     corner_radius=32, height=60, fg_color="transparent",
                                     font=("Helvetica", 15, "bold"), image=logout_icon)
         logout_button.pack(side="bottom", fill="x", padx=20, pady=(15))
 
         self.root.pack_propagate(False)
+    def logout_quesiton(self):
+        self.ask_question("Logout?", "Are you sure you want to logout?", self.logout)
 
     def logout(self):
         self.login_panel.show_panel()
@@ -255,7 +257,7 @@ class NexBank(ctk.CTk):
         self.error_label_transfer = ctk.CTkLabel(transfer_frame, text="", text_color="red")
         self.error_label_transfer.pack(padx=10)
 
-        button_transfer = ctk.CTkButton(transfer_frame, text="Transfer", command=self.process_transfer, corner_radius=32)
+        button_transfer = ctk.CTkButton(transfer_frame, text="Transfer", command=lambda: (self.process_transfer_question(self.entry_amount, self.entry_account_number)), corner_radius=32)
         button_transfer.pack(pady=(5, 30), padx=100)
 
         button_back = ctk.CTkButton(transfer_frame, text="Back", command=self.backDashboard, corner_radius=32)
@@ -263,6 +265,47 @@ class NexBank(ctk.CTk):
 
     def transfer_money(self):
         self.isOpenedCheck(self.transfer_money_comp)
+
+    def process_transfer_question(self, amount, accountNum):
+            account_number = self.entry_account_number.get()
+            amount_str = self.entry_amount.get()
+
+            if not amount_str.strip() or not amount_str.isdigit():
+                self.error_label_transfer.configure(text="Please enter a valid amount.")
+                return
+
+            try:
+                amount = float(amount_str)
+                if amount <= 0:
+                    self.error_label_transfer.configure(text="Please enter a valid positive amount.")
+                    return
+            except ValueError:
+                self.error_label_transfer.configure(text="Please enter a valid numeric amount.")
+                return
+
+            if account_number == self.logged_in_user.account_number:
+                self.error_label_transfer.configure(text="You cannot transfer to yourself. Nice try")
+                return
+
+            bank_charges = 10  
+
+            total_deduction = amount + bank_charges
+
+            if total_deduction > self.logged_in_user.balance:
+                self.error_label_transfer.configure(text="Insufficient funds.")
+                return
+
+            recipient = None
+            for user in self.users.values():
+                if user.account_number == account_number:
+                    recipient = user
+                    break
+
+            if not recipient:
+                self.error_label_transfer.configure(text="Recipient account number not found.")
+                return
+            
+            self.ask_question("Transfer?", f"Are you sure you want to transfer R {amount} to Account: {accountNum}?", self.process_transfer)
 
     def process_transfer(self):
             account_number = self.entry_account_number.get()
@@ -589,7 +632,7 @@ class NexBank(ctk.CTk):
         self.error_label_loan = ctk.CTkLabel(loan_frame, text="", text_color="red")
         self.error_label_loan.pack(padx=10)
 
-        button_loan = ctk.CTkButton(loan_frame, text="Apply", command=self.process_loan, corner_radius=32)
+        button_loan = ctk.CTkButton(loan_frame, text="Apply", command=lambda: (self.process_loan_question(self.entry_loan_amount)), corner_radius=32)
         button_loan.pack(pady=(5, 30), padx=100)
 
         button_back = ctk.CTkButton(loan_frame, text="Back", command=self.backDashboard, corner_radius=32)
@@ -598,6 +641,35 @@ class NexBank(ctk.CTk):
     def take_loan(self):
         self.isOpenedCheck(self.take_loan_comp)
     
+    def process_loan_question(self, amount):
+        amount_str = self.entry_loan_amount.get()
+
+        if not amount_str.strip() or not amount_str.isdigit():
+            self.error_label_loan.configure(text="Please enter a valid amount.")
+            return
+
+        try:
+            amount = float(amount_str)
+            if amount <= 0:
+                self.error_label_loan.configure(text="Please enter a valid positive amount.")
+                return
+        except ValueError:
+            self.error_label_loan.configure(text="Please enter a valid numeric amount.")
+            return
+
+        minimum_balance_required = 500  
+        if self.logged_in_user.balance < minimum_balance_required:
+            self.error_label_loan.configure(text="Insufficient balance to apply for a loan.")
+            return
+
+        bank_charges = 50  
+
+        if self.logged_in_user.balance < bank_charges:
+            self.error_label_loan.configure(text="Insufficient balance to cover bank charges.")
+            return
+        
+        self.ask_question("Loan?", f"Are you sure you want to take a loan of R {amount}?", self.process_loan)
+
     def process_loan(self):
         amount_str = self.entry_loan_amount.get()
 
@@ -680,15 +752,21 @@ class NexBank(ctk.CTk):
         self.welcome_panel.show_panel()
         self.liftAll()
 
-    def quit_application(self):
-        msg = CTkMessagebox(title="Exit?", message="Do you want to close the program?",
-                            icon="question", option_1="Cancel", option_2="No", option_3="Yes", fade_in_duration = 0.1)
+    def ask_question(self, title, message, fun):
+        msg = CTkMessagebox(title=title, message=message,
+                            icon="question", option_1="No", option_2="Yes", fade_in_duration=0.1)
         response = msg.get()
         
         if response=="Yes":
-            self.root.quit()      
+            fun()     
         else:
             print("Click 'Yes' to exit!")
+
+    def quit_application(self):
+        self.ask_question("Quit?", "Do you want to close the program?", quit)
+        
+    def quit(self):
+        self.root.quit() 
 
     def clear_window(self):
         for widget in self.root.winfo_children():
