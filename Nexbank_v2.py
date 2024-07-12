@@ -19,6 +19,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import customtkinter as ctk
 from PIL import Image, ImageTk
+from CTkMessagebox import CTkMessagebox
 
 ctk.set_appearance_mode("Light")
 ctk.set_default_color_theme("themes/red.json")
@@ -680,7 +681,14 @@ class NexBank(ctk.CTk):
         self.liftAll()
 
     def quit_application(self):
-        self.root.quit()
+        msg = CTkMessagebox(title="Exit?", message="Do you want to close the program?",
+                            icon="question", option_1="Cancel", option_2="No", option_3="Yes", fade_in_duration = 0.1)
+        response = msg.get()
+        
+        if response=="Yes":
+            self.root.quit()      
+        else:
+            print("Click 'Yes' to exit!")
 
     def clear_window(self):
         for widget in self.root.winfo_children():
@@ -895,6 +903,8 @@ class LoginPanel:
 
         if email in self.master.users and self.master.users[email].password == password:
             self.master.logged_in_user = self.master.users[email]
+            self.master.view_balance()
+            self.master.dashboard_panel.show_panel()
             self.master.open_dashboard()
             self.master.liftAll()
             root.after(1000, lambda: (self.hideLoginPanels(), self.entry_email.delete(0, 'end'), self.entry_password.delete(0, 'end')))
@@ -1511,7 +1521,7 @@ class CenteredPanel:
         self.root = parent.root
         self.width = 0.65
         self.start_pos = 1.0  
-        self.end_pos = 0.325
+        self.end_pos = 0.35
         self.pos = self.start_pos
         self.in_start_pos = True
 
@@ -1521,8 +1531,7 @@ class CenteredPanel:
         self.create_content()
 
     def create_content(self):
-        self.label_register_welcome = ctk.CTkLabel(self.frame, text="123 Welcome", font=("Helvetica", 25), text_color="#B22E2E")
-        self.label_register_welcome.pack(pady=10)
+        pass
 
     def animate(self, direction):
         if direction == "forward" and self.in_start_pos:
