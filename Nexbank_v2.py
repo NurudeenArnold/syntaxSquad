@@ -65,8 +65,8 @@ class NexBank(ctk.CTk):
         self.register_welcome_panel.hide_panel()
         self.dashboard_panel.hide_panel()
 
-        #self.main_window()
-        self.open_dashboard() #TEST ?////////////////////////////////////////////////////////////////////////
+        self.main_window()
+        #self.open_dashboard() #TEST ?////////////////////////////////////////////////////////////////////////
 
     def load_users(self):
         try:
@@ -257,7 +257,7 @@ class NexBank(ctk.CTk):
         self.error_label_transfer = ctk.CTkLabel(transfer_frame, text="", text_color="red")
         self.error_label_transfer.pack(padx=10)
 
-        button_transfer = ctk.CTkButton(transfer_frame, text="Transfer", command=lambda: (self.process_transfer_question(self.entry_amount, self.entry_account_number)), corner_radius=32)
+        button_transfer = ctk.CTkButton(transfer_frame, text="Transfer", command=self.process_transfer_question, corner_radius=32)
         button_transfer.pack(pady=(5, 30), padx=100)
 
         button_back = ctk.CTkButton(transfer_frame, text="Back", command=self.backDashboard, corner_radius=32)
@@ -266,7 +266,7 @@ class NexBank(ctk.CTk):
     def transfer_money(self):
         self.isOpenedCheck(self.transfer_money_comp)
 
-    def process_transfer_question(self, amount, accountNum):
+    def process_transfer_question(self):
             account_number = self.entry_account_number.get()
             amount_str = self.entry_amount.get()
 
@@ -305,7 +305,7 @@ class NexBank(ctk.CTk):
                 self.error_label_transfer.configure(text="Recipient account number not found.")
                 return
             
-            self.ask_question("Transfer?", f"Are you sure you want to transfer R {amount} to Account: {accountNum}?", self.process_transfer)
+            self.ask_question("Transfer?", f"Are you sure you want to transfer \nR {amount} to Account: {account_number}?", self.process_transfer)
 
     def process_transfer(self):
             account_number = self.entry_account_number.get()
@@ -362,9 +362,8 @@ class NexBank(ctk.CTk):
                                     f"Received R{amount:.2f} from {self.logged_in_user.account_number} on {timestamp}")
 
             self.error_label_transfer.configure(text="Transfer successful.", text_color="green")
-            self.create_popup("Transfer Successful",
-                            f"Transferred R{amount:.2f} to {recipient.account_number} on {timestamp}. \n Bank charges: R{bank_charges:.2f}",
-                            )
+            
+            self.show_checkmark("Success!", f"You have successfully transferred R {amount:.2f} to Account: {recipient.account_number}", self.view_balance)
 
     def view_statement_comp(self):
         image = PhotoImage(file="nexbank2.png")
@@ -705,7 +704,7 @@ class NexBank(ctk.CTk):
         self.save_users()
         self.save_transaction_log(self.logged_in_user.email, transaction_details)
         self.error_label_loan.configure(text="Loan approved and credited to your account.", text_color="green")
-        self.create_popup("Loan Accepted", f"Loan of R{amount:.2f} received on {timestamp}.\nBank Charges: R{bank_charges:.2f}")
+        self.show_checkmark("Success!", f"Loan of R{amount:.2f} approved and credited to your account", self.view_balance)
 
 
     def view_personal_details_comp(self):
@@ -758,6 +757,14 @@ class NexBank(ctk.CTk):
         response = msg.get()
         
         if response=="Yes":
+            fun()     
+
+    def show_checkmark(self, title, message, fun):
+        msg = CTkMessagebox(title=title, message=message,
+                    icon="check", option_1="Okay", fade_in_duration=0.1)
+        
+        response = msg.get()
+        if response=="Okay":
             fun()     
         else:
             print("Click 'Yes' to exit!")
