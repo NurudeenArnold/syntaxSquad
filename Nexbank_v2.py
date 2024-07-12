@@ -195,18 +195,27 @@ class NexBank(ctk.CTk):
         root.after(1000, lambda: (self.dashboard_panel.kill_panel(), self.main_window(), self.liftAll(), self.login_panel.hideLoginPanels()))
 
     def view_balance_comp(self):
+        mainframe = ctk.CTkFrame(self.dashboard_panel.frame, corner_radius=32)
+        mainframe.pack(padx=50, pady=(50, 30))
+
         image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(1, 1)
-        self.image_label = ctk.CTkLabel(self.dashboard_panel.frame, image=resizedImage, text="")
+        self.image_label = ctk.CTkLabel(mainframe, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
 
-        label_balance = ctk.CTkLabel(self.dashboard_panel.frame, text=f"Your Balance: R{self.logged_in_user.balance:.2f}",
-                                                font=("Helvetica", 15))
+        label_balance = ctk.CTkLabel(mainframe, text="Available Balance:",   
+                                                font=("Helvetica", 30))
         label_balance.pack(pady=20)
 
-        button_back = ctk.CTkButton(self.dashboard_panel.frame, text="Back", command=self.backDashboard, corner_radius=32)
-        button_back.pack(pady=10)
+        label_balance = ctk.CTkLabel(mainframe, text=f"R{self.logged_in_user.balance:.2f}",   
+                                                font=("Helvetica", 60, "bold"), text_color="red")
+        label_balance.pack(pady=20)
+
+        button_back = ctk.CTkButton(mainframe, text="Back", command=self.backDashboard, corner_radius=32)
+        button_back.pack(pady=50, padx=200)
+
+
 
     def view_balance(self):
             self.isOpenedCheck(self.view_balance_comp)
