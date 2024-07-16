@@ -83,3 +83,11 @@ nurudeenarnold123@gmail.com,Received R100.00 from 1822141656 on 2024-07-12 11:25
 nurudeenarnold@gmail.com,Transferred R100.00 to 8382790965 on 2024-07-12 11:26:26, Bank Charges: R10.00
 nurudeenarnold123@gmail.com,Received R100.00 from 1822141656 on 2024-07-12 11:26:26
 nurudeenarnold@gmail.com,Loan of R310.00 received on 2024-07-12 11:30:56, Bank Charges: R50.00
+nurudeenarnold@gmail.com,Transferred R50.00 to 8382790965 on 2024-07-16 21:17:26, Bank Charges: R10.00
+nurudeenarnold123@gmail.com,Received R50.00 from 1822141656 on 2024-07-16 21:17:26
+nurudeenarnold@gmail.com,Transferred R80.00 to 8382790965 on 2024-07-16 21:17:59, Bank Charges: R10.00
+nurudeenarnold123@gmail.com,Received R80.00 from 1822141656 on 2024-07-16 21:17:59
+nurudeenarnold@gmail.com,Transferred R90.00 to 8382790965 on 2024-07-16 21:18:53, Bank Charges: R10.00
+nurudeenarnold123@gmail.com,Received R90.00 from 1822141656 on 2024-07-16 21:18:53
+nurudeenarnold@gmail.com,Loan of R600.00 received on 2024-07-16 21:19:20, Bank Charges: R50.00
+nurudeenarnold@gmail.com,Loan of R800.00 received on 2024-07-16 21:19:29, Bank Charges: R50.00
