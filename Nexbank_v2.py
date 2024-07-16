@@ -95,7 +95,7 @@ class NexBank(ctk.CTk):
         try:
             with open("UserData.txt", "w") as file:
                 for user in self.users.values():
-                    file.write(f"{user.email},{user.password},{user.account_number},{user.contact},{user.dob}, {user.ID},{user.balance}\n")
+                    file.write(f"{user.email},{user.password},{user.account_number},{user.contact},{user.dob},{user.ID},{user.balance}\n")
         except Exception as e:
             print(f"Error saving users: {e}")
 
@@ -624,8 +624,8 @@ class NexBank(ctk.CTk):
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
 
-        self.label_title = ctk.CTkLabel(main_frame, text="Take Loan/Overdraft", font=("Helvetica", 25),
-                                                  text_color="#B22E2E")
+        self.label_title = ctk.CTkLabel(main_frame, text="Take Loan/Overdraft", font=("Helvetica", 30),
+                                             text_color="#B22E2E")
         self.label_title.pack(pady=10)
 
         label_amount = ctk.CTkLabel(main_frame, text="Loan Amount:")
@@ -714,40 +714,40 @@ class NexBank(ctk.CTk):
 
 
     def view_personal_details_comp(self):
+        mainframe = ctk.CTkFrame(self.dashboard_panel.frame, corner_radius=32)
+        mainframe.pack(padx=50, pady=(50, 30))
+
         image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(1, 1)
-        self.image_label = ctk.CTkLabel(self.dashboard_panel.frame, image=resizedImage, text="")
+        self.image_label = ctk.CTkLabel(mainframe, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
 
-        label_title = ctk.CTkLabel(self.dashboard_panel.frame, text="Personal Details", font=("Helvetica", 25),
+        label_title = ctk.CTkLabel(mainframe, text="Personal Details", font=("Helvetica", 30),
                                              text_color="#B22E2E")
-        label_title.pack(pady=10)
+        label_title.pack(pady=20)
 
-        details_frame = ctk.CTkFrame(self.dashboard_panel.frame)
-        details_frame.pack(padx=10, pady=10)
+        label_ID = ctk.CTkLabel(mainframe, text=f"ID Number: {self.logged_in_user.ID}", font=("Helvetica", 17))
+        label_ID.pack(pady=5)
 
-        label_ID = ctk.CTkLabel(details_frame, text=f"ID Number: {self.logged_in_user.ID}")
-        label_ID.pack()
+        label_email = ctk.CTkLabel(mainframe, text=f"Email: {self.logged_in_user.email}", font=("Helvetica", 17))
+        label_email.pack(pady=5)
 
-        label_email = ctk.CTkLabel(details_frame, text=f"Email: {self.logged_in_user.email}")
-        label_email.pack()
+        label_account_number = ctk.CTkLabel(mainframe,
+                                                      text=f"Account Number: {self.logged_in_user.account_number}", font=("Helvetica", 17))
+        label_account_number.pack(pady=5)
 
-        label_account_number = ctk.CTkLabel(details_frame,
-                                                      text=f"Account Number: {self.logged_in_user.account_number}")
-        label_account_number.pack()
+        label_contact = ctk.CTkLabel(mainframe, text=f"Contact Number: {self.logged_in_user.contact}", font=("Helvetica", 17))
+        label_contact.pack(pady=5)
 
-        label_contact = ctk.CTkLabel(details_frame, text=f"Contact Number: {self.logged_in_user.contact}")
-        label_contact.pack()
+        label_dob = ctk.CTkLabel(mainframe, text=f"Date of Birth: {self.logged_in_user.dob}", font=("Helvetica", 17))
+        label_dob.pack(pady=5)
 
-        label_dob = ctk.CTkLabel(details_frame, text=f"Date of Birth: {self.logged_in_user.dob}")
-        label_dob.pack()
+        label_balance = ctk.CTkLabel(mainframe, text=f"Balance: R{self.logged_in_user.balance:.2f}", font=("Helvetica", 17))
+        label_balance.pack(pady=5)
 
-        label_balance = ctk.CTkLabel(details_frame, text=f"Balance: R{self.logged_in_user.balance:.2f}")
-        label_balance.pack()
-
-        button_back = ctk.CTkButton(details_frame, text="Back", command=self.backDashboard, corner_radius=32)
-        button_back.pack(pady=10, padx=100)
+        button_back = ctk.CTkButton(mainframe, text="Back", command=self.backDashboard, corner_radius=32)
+        button_back.pack(pady=10, padx=200)
 
     def view_personal_details(self):
         self.isOpenedCheck(self.view_personal_details_comp)
@@ -759,7 +759,7 @@ class NexBank(ctk.CTk):
 
     def ask_question(self, title, message, fun):
         msg = CTkMessagebox(title=title, message=message,
-                            icon="question", option_1="No", option_2="Yes", fade_in_duration=0.1)
+                            icon="question", option_1="No", option_2="Yes")
         response = msg.get()
         
         if response=="Yes":
@@ -767,7 +767,7 @@ class NexBank(ctk.CTk):
 
     def show_checkmark(self, title, message, fun):
         msg = CTkMessagebox(title=title, message=message,
-                    icon="check", option_1="Okay", fade_in_duration=0.1)
+                    icon="check", option_1="Okay")
         
         response = msg.get()
         if response=="Okay":
@@ -998,7 +998,7 @@ class LoginPanel:
             self.master.dashboard_panel.show_panel()
             self.master.open_dashboard()
             self.master.liftAll()
-            root.after(1000, lambda: (self.hideLoginPanels(), self.entry_email.delete(0, 'end'), self.entry_password.delete(0, 'end')))
+            root.after(1000, lambda: (self.hideLoginPanels()))
             
         else:
             self.error_label.configure(text="Invalid email or password.")
@@ -1009,6 +1009,12 @@ class LoginPanel:
 
     def hide_panel(self):
         self.animate("backward")
+        root.after(1000, self.reset_panel)
+    
+    def reset_panel(self):
+        self.entry_email.delete(0, 'end')
+        self.entry_password.delete(0, 'end')
+        self.error_label.configure(text="")
 
     def animate(self, direction):
         if direction == "forward" and self.in_start_pos:
@@ -1305,7 +1311,7 @@ class RegisterPanel:
 
         label_title = ctk.CTkLabel(
             self.TandC, text="Terms & Conditions", 
-            font=("Helvetica", 25), text_color="B22E2E"
+            font=("Helvetica", 25), text_color="#B22E2E"
         )
         label_title.pack(pady=10, padx=30)
 
@@ -1336,6 +1342,7 @@ class RegisterPanel:
         self.TandC.destroy()
 
     def cancel(self):
+        self.var_terms_conditions.set(False)
         self.checkbutton_terms_conditions.configure(state="normal")
         self.TandC.destroy()
 
@@ -1537,6 +1544,19 @@ class RegisterPanel:
 
     def hide_panel(self):
         self.animate("backward")
+        root.after(1000, self.reset_panel)
+    
+    def reset_panel(self):
+        self.entry_ID.delete(0, 'end')
+        self.entry_DOB.delete(0, 'end')
+        self.entry_contact.delete(0, 'end')
+        self.entry_email.delete(0, 'end')
+        self.entry_password.delete(0, 'end')
+        self.entry_confirmPassword.delete(0, 'end')
+        self.checkbutton_terms_conditions.deselect()
+        self.checkbutton_terms_conditions.configure(state="disabled")
+        self.error_label_reg.configure(text="")
+        self.button_register.configure(text="Register")
     
     def show_panel(self):
         self.animate("forward")
