@@ -65,8 +65,8 @@ class NexBank(ctk.CTk):
         self.register_welcome_panel.hide_panel()
         self.dashboard_panel.hide_panel()
 
-        self.main_window()
-        #self.open_dashboard() #TEST ?////////////////////////////////////////////////////////////////////////
+        #self.main_window()
+        self.open_dashboard() #TEST ?////////////////////////////////////////////////////////////////////////
 
     def load_users(self):
         try:
@@ -215,8 +215,6 @@ class NexBank(ctk.CTk):
         button_back = ctk.CTkButton(mainframe, text="Back", command=self.backDashboard, corner_radius=32)
         button_back.pack(pady=50, padx=200)
 
-
-
     def view_balance(self):
             self.isOpenedCheck(self.view_balance_comp)
 
@@ -239,38 +237,37 @@ class NexBank(ctk.CTk):
         self.dashboard_panel.hide_panel()
     
     def transfer_money_comp(self):
+        main_frame = ctk.CTkFrame(self.dashboard_panel.frame, corner_radius=32)
+        main_frame.pack(padx=50, pady=50)
+
         image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(1, 1)
-        self.image_label = ctk.CTkLabel(self.dashboard_panel.frame, image=resizedImage, text="")
+        self.image_label = ctk.CTkLabel(main_frame, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
-        self.label_title = ctk.CTkLabel(self.dashboard_panel.frame, text="Transfer Money", font=("Helvetica", 25),
-                                                  text_color="#B22E2E")
+        self.label_title = ctk.CTkLabel(main_frame, text="Transfer Funds", font=("Helvetica", 30), text_color="#B22E2E")
         self.label_title.pack(pady=10)
 
-        transfer_frame = ctk.CTkFrame(self.dashboard_panel.frame)
-        transfer_frame.pack(padx=10, pady=10)
-
-        label_account_number = ctk.CTkLabel(transfer_frame, text="Recipient Account Number:")
+        label_account_number = ctk.CTkLabel(main_frame, text="Recipient Account Number:")
         label_account_number.pack()
 
-        self.entry_account_number = ctk.CTkEntry(transfer_frame)
+        self.entry_account_number = ctk.CTkEntry(main_frame, width=250, height=25, font=("Helvetica", 15))
         self.entry_account_number.pack()
 
-        label_amount = ctk.CTkLabel(transfer_frame, text="Amount:")
+        label_amount = ctk.CTkLabel(main_frame, text="Amount:")
         label_amount.pack()
 
-        self.entry_amount = ctk.CTkEntry(transfer_frame)
+        self.entry_amount = ctk.CTkEntry(main_frame, width=250, height=25, font=("Helvetica", 15))
         self.entry_amount.pack()
 
-        self.error_label_transfer = ctk.CTkLabel(transfer_frame, text="", text_color="red")
+        self.error_label_transfer = ctk.CTkLabel(main_frame, text="", text_color="#B22E2E")
         self.error_label_transfer.pack(padx=10)
 
-        button_transfer = ctk.CTkButton(transfer_frame, text="Transfer", command=self.process_transfer_question, corner_radius=32)
-        button_transfer.pack(pady=(5, 30), padx=100)
+        button_transfer = ctk.CTkButton(main_frame, text="Transfer", command=self.process_transfer_question, corner_radius=32)
+        button_transfer.pack(pady=(5, 30))
 
-        button_back = ctk.CTkButton(transfer_frame, text="Back", command=self.backDashboard, corner_radius=32)
-        button_back.pack(pady=(5, 30), padx=100)
+        button_back = ctk.CTkButton(main_frame, text="Back", command=self.backDashboard, corner_radius=32)
+        button_back.pack(pady=(5, 30), padx=200)
 
     def transfer_money(self):
         self.isOpenedCheck(self.transfer_money_comp)
@@ -381,11 +378,11 @@ class NexBank(ctk.CTk):
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
 
-        label_title = ctk.CTkLabel(self.dashboard_panel.frame, text="Bank Statement", font=("Helvetica", 25),  text_color="#B22E2E")
-        label_title.pack(pady=10, padx=100)
+        label_title = ctk.CTkLabel(self.dashboard_panel.frame, text="Bank Statement", font=("Helvetica", 30), text_color="#B22E2E")
+        label_title.pack(pady=20, padx=100)
 
         canvas = Canvas(self.dashboard_panel.frame, borderwidth=0, highlightthickness=0)
-        frame = Frame(canvas)
+        frame = Frame(canvas, bg="gray90")
         vsb = tk.Scrollbar(self.dashboard_panel.frame, orient="vertical", command=canvas.yview)
         canvas.configure(yscrollcommand=vsb.set)
 
@@ -618,33 +615,33 @@ class NexBank(ctk.CTk):
         print(f"Transaction history saved to {pdf_filename}")
 
     def take_loan_comp(self):
+        main_frame = ctk.CTkFrame(self.dashboard_panel.frame, corner_radius=32)
+        main_frame.pack(padx=50, pady=50)
+
         image = PhotoImage(file="nexbank2.png")
         resizedImage = image.subsample(1, 1)
-        self.image_label = ctk.CTkLabel(self.dashboard_panel.frame, image=resizedImage, text="")
+        self.image_label = ctk.CTkLabel(main_frame, image=resizedImage, text="")
         self.image_label.image = resizedImage
         self.image_label.pack(pady=20)
 
-        self.label_title = ctk.CTkLabel(self.dashboard_panel.frame, text="Take Loan/Overdraft", font=("Helvetica", 25),
+        self.label_title = ctk.CTkLabel(main_frame, text="Take Loan/Overdraft", font=("Helvetica", 25),
                                                   text_color="#B22E2E")
         self.label_title.pack(pady=10)
 
-        loan_frame = ctk.CTkFrame(self.dashboard_panel.frame)
-        loan_frame.pack(padx=10, pady=10)
-
-        label_amount = ctk.CTkLabel(loan_frame, text="Loan Amount:")
+        label_amount = ctk.CTkLabel(main_frame, text="Loan Amount:")
         label_amount.pack()
 
-        self.entry_loan_amount = ctk.CTkEntry(loan_frame)
+        self.entry_loan_amount = ctk.CTkEntry(main_frame, width=250, height=25, font=("Helvetica", 15))
         self.entry_loan_amount.pack()
 
-        self.error_label_loan = ctk.CTkLabel(loan_frame, text="", text_color="red")
+        self.error_label_loan = ctk.CTkLabel(main_frame, text="", text_color="red")
         self.error_label_loan.pack(padx=10)
 
-        button_loan = ctk.CTkButton(loan_frame, text="Apply", command=lambda: (self.process_loan_question(self.entry_loan_amount)), corner_radius=32)
-        button_loan.pack(pady=(5, 30), padx=100)
+        button_loan = ctk.CTkButton(main_frame, text="Apply", command=lambda: (self.process_loan_question(self.entry_loan_amount)), corner_radius=32)
+        button_loan.pack(pady=(5, 30))
 
-        button_back = ctk.CTkButton(loan_frame, text="Back", command=self.backDashboard, corner_radius=32)
-        button_back.pack(pady=(5, 30), padx=100)
+        button_back = ctk.CTkButton(main_frame, text="Back", command=self.backDashboard, corner_radius=32)
+        button_back.pack(pady=(5, 30), padx=200)
 
     def take_loan(self):
         self.isOpenedCheck(self.take_loan_comp)
@@ -1308,7 +1305,7 @@ class RegisterPanel:
 
         label_title = ctk.CTkLabel(
             self.TandC, text="Terms & Conditions", 
-            font=("Helvetica", 25), text_color="red"
+            font=("Helvetica", 25), text_color="B22E2E"
         )
         label_title.pack(pady=10, padx=30)
 
